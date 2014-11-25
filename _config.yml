@@ -1,0 +1,12 @@
+# Site settings
+title: Elaine's Blog
+email: gaohuielaine@gmail.com
+description: > # this means to ignore newlines until "baseurl:"
+  Leave something behind, keep moving forward.
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://yourdomain.com" # the base hostname & protocol for your site
+twitter_username: G.Elaine
+github_username:  GHElaine
+
+# Build settings
+markdown: kramdown
