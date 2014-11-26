@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>About</title>
+  <title>Linux高性能服务器编程 读书笔记-CH1</title>
 </head>
 
   <head>
@@ -10,12 +10,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width initial-scale=1">
 
-  <title>About</title>
-  <meta name="description" content="Leave something behind, keep moving forward.
-">
+  <title>Linux高性能服务器编程 读书笔记-CH1</title>
+  <meta name="description" content="Linux高性能服务器编程  Edit by Elaine @2014.11.22    ">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/about/">
+  <link rel="canonical" href="http://yourdomain.com/2014/11/26/LearningLinux0.html">
   <link rel="alternate" type="application/atom+xml" title="Elaine's Blog" href="http://yourdomain.com/feed.xml" />
 </head>
 
@@ -60,22 +59,53 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <div class="post">
+        <h1 id="linux">Linux高性能服务器编程</h1>
+<blockquote>
+  <p>Edit by Elaine @2014.11.22    </p>
+</blockquote>
 
-  <header class="post-header">
-    <h1 class="post-title">About</h1>
-  </header>
+<h3 id="tcpip">第一章  TCP/IP协议族</h3>
 
-  <article class="post-content">
-    <p>This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at <a href="http://jekyllrb.com/">jekyllrb.com</a></p>
+<h4 id="tcpip-1">TCP/IP协议族体系结构及主要协议</h4>
+<ul>
+  <li>
+    <p>数据链路层 <br />
+  ARP地址解析协议  <strong>将IP地址解析成MAC地址（物理地址）</strong>  <br />
+  RARP逆地址解析协议  <strong>无盘工作站可以通过网卡上的物理地址来向网络管理者询问自身的IP地址</strong>      </p>
+  </li>
+  <li>
+    <p>网络层 <br />
+  实现数据包的选路和转发。  <br />
+  IP协议（因特网协议）  <strong>根据数据包的IP地址决定如何投递， 使用逐跳的方式确定通讯路径</strong> <br />
+  ICMP协议（因特网控制报文协议） <strong>主要用于检测网络连接</strong> </p>
 
-<p>You can find the source code for the Jekyll new theme at: <a href="https://github.com/jglovier/jekyll-new">github.com/jglovier/jekyll-new</a></p>
+    <blockquote>
+      <p><strong>差错报文</strong>  用来回应网路错误：1.目标不可达（值为3）2.重定向（值为5）<br />
+<strong>查询报文</strong> 用来查询网络信息，比如ping查询是否可达（值为8）   </p>
+    </blockquote>
+  </li>
+  <li>
+    <p>传输层<br />
+  为两台主机上的应用程序提供端到端的通信。 <br />
+  TCP协议（传输控制协议） <strong>为应用层提供可靠的，面向连接和基于流的服务。可靠的。没有边界长度限制。</strong>    <br />
+  UDP（用户数据报协议） <strong>为应用层提供不可靠、无连接和基于数据报的服务。不可靠。</strong>  <br />
+  SCTP（流控制传输协议） <strong>为因特网上传输电话信号二设计</strong>     </p>
+  </li>
+  <li>
+    <p>应用层 <br />
+  负责处理应用程序的逻辑。 <br />
+  DNS（域名服务）<strong>提供机器域名到其IP地址的转换</strong>    </p>
+  </li>
+  <li>
+    <p>封装 <br />
+  用户应用向目的主机请求时，请求内容自顶向下打包成帧的过程。    </p>
+  </li>
+  <li>
+    <p>分用<br />
+  目的主机收到请求时，沿着协议栈自底向上分别处理数据，并最终交给目标服务或应用程序的过程。    </p>
+  </li>
+</ul>
 
-<p>You can find the source code for Jekyll at <a href="https://github.com/jekyll/jekyll">github.com/jekyll/jekyll</a></p>
-
-  </article>
-
-</div>
 
       </div>
     </div>

@@ -6,9 +6,66 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 25 Nov 2014 22:55:05 +0800</pubDate>
-    <lastBuildDate>Tue, 25 Nov 2014 22:55:05 +0800</lastBuildDate>
+    <pubDate>Thu, 27 Nov 2014 00:45:53 +0800</pubDate>
+    <lastBuildDate>Thu, 27 Nov 2014 00:45:53 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
+    
+      <item>
+        <title>Linux高性能服务器编程 读书笔记-CH1</title>
+        <description>&lt;h1 id=&quot;linux&quot;&gt;Linux高性能服务器编程&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Elaine @2014.11.22    &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;tcpip&quot;&gt;第一章  TCP/IP协议族&lt;/h3&gt;
+
+&lt;h4 id=&quot;tcpip-1&quot;&gt;TCP/IP协议族体系结构及主要协议&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;数据链路层 &lt;br /&gt;
+  ARP地址解析协议  &lt;strong&gt;将IP地址解析成MAC地址（物理地址）&lt;/strong&gt;  &lt;br /&gt;
+  RARP逆地址解析协议  &lt;strong&gt;无盘工作站可以通过网卡上的物理地址来向网络管理者询问自身的IP地址&lt;/strong&gt;      &lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;网络层 &lt;br /&gt;
+  实现数据包的选路和转发。  &lt;br /&gt;
+  IP协议（因特网协议）  &lt;strong&gt;根据数据包的IP地址决定如何投递， 使用逐跳的方式确定通讯路径&lt;/strong&gt; &lt;br /&gt;
+  ICMP协议（因特网控制报文协议） &lt;strong&gt;主要用于检测网络连接&lt;/strong&gt; &lt;/p&gt;
+
+    &lt;blockquote&gt;
+      &lt;p&gt;&lt;strong&gt;差错报文&lt;/strong&gt;  用来回应网路错误：1.目标不可达（值为3）2.重定向（值为5）&lt;br /&gt;
+&lt;strong&gt;查询报文&lt;/strong&gt; 用来查询网络信息，比如ping查询是否可达（值为8）   &lt;/p&gt;
+    &lt;/blockquote&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;传输层&lt;br /&gt;
+  为两台主机上的应用程序提供端到端的通信。 &lt;br /&gt;
+  TCP协议（传输控制协议） &lt;strong&gt;为应用层提供可靠的，面向连接和基于流的服务。可靠的。没有边界长度限制。&lt;/strong&gt;    &lt;br /&gt;
+  UDP（用户数据报协议） &lt;strong&gt;为应用层提供不可靠、无连接和基于数据报的服务。不可靠。&lt;/strong&gt;  &lt;br /&gt;
+  SCTP（流控制传输协议） &lt;strong&gt;为因特网上传输电话信号二设计&lt;/strong&gt;     &lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;应用层 &lt;br /&gt;
+  负责处理应用程序的逻辑。 &lt;br /&gt;
+  DNS（域名服务）&lt;strong&gt;提供机器域名到其IP地址的转换&lt;/strong&gt;    &lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;封装 &lt;br /&gt;
+  用户应用向目的主机请求时，请求内容自顶向下打包成帧的过程。    &lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;分用&lt;br /&gt;
+  目的主机收到请求时，沿着协议栈自底向上分别处理数据，并最终交给目标服务或应用程序的过程。    &lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+        <pubDate>Wed, 26 Nov 2014 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2014/11/26/LearningLinux0.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2014/11/26/LearningLinux0.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Hello World</title>
