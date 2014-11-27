@@ -6,9 +6,35 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 27 Nov 2014 00:45:53 +0800</pubDate>
-    <lastBuildDate>Thu, 27 Nov 2014 00:45:53 +0800</lastBuildDate>
+    <pubDate>Thu, 27 Nov 2014 15:06:08 +0800</pubDate>
+    <lastBuildDate>Thu, 27 Nov 2014 15:06:08 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
+    
+      <item>
+        <title>黑客与画家-读书笔记</title>
+        <description>&lt;h1 id=&quot;paul-graham&quot;&gt;黑客与画家 · Paul Graham&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;blockquote&gt;
+    &lt;p&gt;edit by Elaine -2014-11-09    &lt;/p&gt;
+  &lt;/blockquote&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;程序是写给人看的，附带能在机器上运行。  &lt;/li&gt;
+  &lt;li&gt;触怒他人的言论是那些可能会有人相信的言论。  最令人暴跳如雷的言论，就是被认为说出了真相的言论。    &lt;/li&gt;
+  &lt;li&gt;自由思考比畅所欲言更重要。    &lt;/li&gt;
+  &lt;li&gt;如果自己就是潮水的一部分，怎么能看见潮流的方向呢？你只能永远保持质疑。  &lt;/li&gt;
+  &lt;li&gt;安全问题的关键在于不要有漏洞，而不是任何设计上的决策。  &lt;/li&gt;
+  &lt;li&gt;财富才是你的目标，金钱不是。  金钱是财富的一种简便的表达方式。  &lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+        <pubDate>Thu, 27 Nov 2014 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2014/11/27/Hacker.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2014/11/27/Hacker.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Linux高性能服务器编程 读书笔记-CH1</title>
