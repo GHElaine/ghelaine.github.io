@@ -215,6 +215,11 @@ pre {
  * Site footer
  */
  .description {
+  line-height: 20px;
+  font-size: 15px;
+  color: #FFFFFF;
+ }
+ .motto {
   font-style: italic;
   font-size: 18px;
   color: #000000;
