@@ -18,7 +18,8 @@ index_top {
  * Basic styling
  */
 body {
-  font-family: Helvetica, Arial, sans-serif;
+  /*font-family: Helvetica, Arial, sans-serif,'Hiragino Sans GB';*/
+  font-family: "Helvetica Neue",Helvetica,Tahoma,Arial,,"Merriweather";
   font-size: 16px;
   line-height: 1.5;
   font-weight: 300;
