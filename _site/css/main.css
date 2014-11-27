@@ -162,7 +162,7 @@ pre {
 .site-title {
   font-size: 15px;
   line-height: 20px;
-  letter-spacing: -1px;
+  /*letter-spacing: -1px;*/
   margin-bottom: 0;
   float: left; }
   .site-title, .site-title:visited {
@@ -175,7 +175,7 @@ pre {
     display: none; }
   .site-nav .page-link {
     color: #FFFFFF;
-    line-height: 1.5; }
+    line-height: 20px; }
     .site-nav .page-link:not(:first-child) {
       margin-left: 20px; }
   @media screen and (max-width: 600px) {

@@ -6,8 +6,8 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 27 Nov 2014 15:10:59 +0800</pubDate>
-    <lastBuildDate>Thu, 27 Nov 2014 15:10:59 +0800</lastBuildDate>
+    <pubDate>Thu, 27 Nov 2014 16:22:12 +0800</pubDate>
+    <lastBuildDate>Thu, 27 Nov 2014 16:22:12 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
     
       <item>
@@ -83,8 +83,15 @@
     &lt;p&gt;分用&lt;br /&gt;
   目的主机收到请求时，沿着协议栈自底向上分别处理数据，并最终交给目标服务或应用程序的过程。    &lt;/p&gt;
   &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;socket和TCP/IP &lt;br /&gt;
+  实现应用程序访问协议服务的系统调用。  &lt;/p&gt;
+    &lt;ol&gt;
+      &lt;li&gt;将应用程序数据从用户缓冲区复制到TCP/UDP内核发送缓冲区，交付内核发送数据；或由内核TCP/UDP接收缓冲区中复制数据到用户缓冲区，以读取数据。&lt;/li&gt;
+      &lt;li&gt;可以通过它们来修改内核中各层协议的某些头部信息或其他数据结构，更精细的控制底层通信。&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
-
 </description>
         <pubDate>Wed, 26 Nov 2014 00:00:00 +0800</pubDate>
         <link>http://yourdomain.com/2014/11/26/LearningLinux0.html</link>
