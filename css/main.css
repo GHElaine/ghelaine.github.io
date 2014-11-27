@@ -23,7 +23,7 @@ body {
   line-height: 1.5;
   font-weight: 300;
   color: #111;
-  background-color: #D0D0D0;;
+  background-color: #FFFFFF;;
   -webkit-text-size-adjust: 100%; }
 
 /**
@@ -71,12 +71,12 @@ h1, h2, h3, h4, h5, h6 {
  * Links
  */
 a {
-  color: #F90707;
+  color: #736C6C;
   text-decoration: none; }
   a:visited {
-    color: #F90707; }
+    color: #736C6C; }
   a:hover {
-    color: #736C6C;
+    color: #F90707;
     text-decoration: underline; }
 
 /**
