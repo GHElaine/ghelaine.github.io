@@ -1,19 +1,17 @@
+html {
+  background-size: cover;
+  height: 100%;
+  text-align: center center;
+}
 /**
  * Reset some basic elements
  */
+
 body, h1, h2, h3, h4, h5, h6,
 p, blockquote, pre, hr,
 dl, dd, ol, ul, figure {
   margin: 0;
   padding: 0; }
-/**
- * Index top
- */
-index_top {
-  line-height: 20px;
-  font-size: 15px;
-  color: #FFFFFF;
-}
 /**
  * Basic styling
  */
@@ -24,6 +22,8 @@ body {
   line-height: 1.5;
   font-weight: 300;
   color: #111;
+  height: 100%;
+  background-size: cover;
   background-color: #FFFFFF;;
   -webkit-text-size-adjust: 100%; }
 
@@ -117,6 +117,7 @@ pre {
 /**
  * Wrapper
  */
+
 .wrapper {
   max-width: -webkit-calc(800px - (30px * 2));
   max-width: calc(800px - (30px * 2));
@@ -154,10 +155,17 @@ pre {
  * Site header
  */
 .site-header {
+  background: #FFFFFF no-repeat center center;
+  background-image: url(/img/kaka2.jpg);
+  background-size: cover;
   border-top: 5px solid #424242;
   border-bottom: 1px solid #e8e8e8;
   background-color: #000000;
-  min-height: 20px;
+  text-align: center center;
+
+  width: 100%;
+  height: 100%;
+  /*min-height: 20px;*/
   position: relative; }
 
 .site-title {
@@ -208,16 +216,23 @@ pre {
         display: block;
         padding-bottom: 5px; }
       .site-nav .page-link {
-        display: block;
+        display: none;
         padding: 5px 10px; } }
 
 /**
  * Site footer
  */
  .description {
+  text-align: center;
   line-height: 20px;
-  font-size: 15px;
+  font-size: 25px;
   color: #FFFFFF;
+  position: absolute;
+  padding: 30px 0;
+  bottom: 30px;
+  letter-spacing: 2px;
+  line-height: inherit;
+  font-style: oblique;
  }
  .motto {
   font-style: italic;
