@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Elaine's blog</title>
+  <title>Linux高性能服务器编程-读书笔记-CH2</title>
 </head>
 
   <head>
@@ -10,12 +10,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width initial-scale=1">
 
-  <title>Elaine's blog</title>
-  <meta name="description" content="Leave something behind, keep moving forward.
-">
+  <title>Linux高性能服务器编程-读书笔记-CH2</title>
+  <meta name="description" content="Linux高性能服务器编程  Edit by Elaine @2014.11.28     第二章 IP协议详解  IP服务的特点   无状态（通信双方不同步传输数据的状态信息）可能是乱序、重复的数据           优点：简单高效  无连接（通信双方不长久维持对方的任何信息）每次发送都必须指明IP    不...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/">
+  <link rel="canonical" href="http://yourdomain.com/2014/11/28/LearnLinux1.html">
   <link rel="alternate" type="application/atom+xml" title="Elaine's Blog" href="http://yourdomain.com/feed.xml" />
 </head>
 
@@ -62,90 +61,33 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <!DOCTYPE html>
-<html>
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Elaine's Blog</title>
-</head>
+        <h1 id="linux">Linux高性能服务器编程</h1>
+<blockquote>
+  <p>Edit by Elaine @2014.11.28     </p>
+</blockquote>
 
-  <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width initial-scale=1">
+<h3 id="ip">第二章 IP协议详解</h3>
+<ul>
+  <li>IP服务的特点 <br />
+  <strong>无状态</strong>（通信双方不同步传输数据的状态信息）可能是乱序、重复的数据     <br />
+      优点：简单高效
+  <strong>无连接</strong>（通信双方不长久维持对方的任何信息）每次发送都必须指明IP  <br />
+  <strong>不可靠</strong>（不能保证IP数据报准确的到达接收端）上层需要自己实现数据确认，超时重传等      </li>
+  <li>IP转发<br />
+    <ul>
+      <li>检查数据报头部TTL值，若为0，丢弃数据报；</li>
+      <li>查看路由选择新安乡，若设置了该选项，则检查数据报的目标IP地址是否为本机的某个IP地址，若不是，则发送ICMP源站选路失败报文给发送端；  </li>
+      <li>若有必要，则发源端一个ICMP重定向报文，告诉它一个更合理的下一跳路由器；   </li>
+      <li>TTL值-1；  </li>
+      <li>处理IP头部选项；   </li>
+      <li>若有必要，执行IP分片操作；   </li>
+    </ul>
+  </li>
+</ul>
 
-  <title>Elaine's Blog</title>
-  <meta name="description" content="Leave something behind, keep moving forward.
-">
-
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/">
-  <link rel="alternate" type="application/atom+xml" title="Elaine's Blog" href="http://yourdomain.com/feed.xml" />
-</head>
-
-
-<body> 
-<div class="page-content">
-<div class="wrapper">
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Ghelaine.GitHub.io by GHElaine</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
-  </head>
-  <body>
-      <header class="header"> 
-        <h1><strong>Elaine's Blog</strong></h1>
-        <p>Leave something behind, keep moving forward</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/GHElaine" class="button fork"><strong>Elaine's GitHub</strong></a>
-      </div><!-- end banner -->
-    <header class=“page-content”>
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
-  <section>
-      <p> 最新博文 </p>
-      <ul> 
-        
-           <li>28 Nov 2014 <a href="/2014/11/28/LearnLinux1.html">Linux高性能服务器编程-读书笔记-CH2</a></li>
-        
-           <li>27 Nov 2014 <a href="/2014/11/27/Hacker.html">黑客与画家-读书笔记</a></li>
-        
-           <li>26 Nov 2014 <a href="/2014/11/26/LearningLinux0.html">Linux高性能服务器编程 读书笔记-CH1</a></li>
-        
-      </ul>
-      </section> 
-    </header>
-      <footer>
-        <!-- <p><small>Hosted on GitHub Pages</small></p> -->
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
-  </body>
-  </html>
-      </div>
-    </div>
-
-  </body>
-
-</html>
+<p><code>   
+    IPV6并不是IPV4的简单扩展，而是完全不同的协议， 除了解决IP不够用的问题，还增加了多播和流的功能，引入了自动配置功能，增加专门的网络安全功能等。
+</code></p>
 
       </div>
     </div>
