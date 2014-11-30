@@ -6,8 +6,8 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 29 Nov 2014 01:27:09 +0800</pubDate>
-    <lastBuildDate>Sat, 29 Nov 2014 01:27:09 +0800</lastBuildDate>
+    <pubDate>Sun, 30 Nov 2014 15:14:16 +0800</pubDate>
+    <lastBuildDate>Sun, 30 Nov 2014 15:14:16 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
     
       <item>
@@ -36,8 +36,8 @@
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;code&gt;   
-    IPV6并不是IPV4的简单扩展，而是完全不同的协议， 除了解决IP不够用的问题，还增加了多播和流的功能，引入了自动配置功能，增加专门的网络安全功能等。
+&lt;p&gt;&lt;code&gt;
+IPV6并不是IPV4的简单扩展，而是完全不同的协议， 除了解决IP不够用的问题，还增加了多播和流的功能，引入了自动配置功能，增加专门的网络安全功能等。   
 &lt;/code&gt;&lt;/p&gt;
 </description>
         <pubDate>Fri, 28 Nov 2014 00:00:00 +0800</pubDate>
