@@ -5,7 +5,7 @@
 <head>
  
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>黑客与画家-读书笔记</title>
+  <title>Linux高性能服务器编程-读书笔记-CH4</title>
 </head>
 
   <head>
@@ -13,11 +13,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width initial-scale=1">
 
-  <title>黑客与画家-读书笔记</title>
-  <meta name="description" content="黑客与画家 · Paul Graham      edit by Elaine -2014-11-09      ">
+  <title>Linux高性能服务器编程-读书笔记-CH4</title>
+  <meta name="description" content="Leave something behind, keep moving forward.
+">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/2014/11/27/Hacker.html">
+  <link rel="canonical" href="http://yourdomain.com/2014-12-2-LearnLinux3.html">
   <link rel="alternate" type="application/atom+xml" title="Elaine's Blog" href="http://yourdomain.com/feed.xml" />
   
   <style id="fit-vids-style">
@@ -35,6 +36,10 @@
       <div>more about life</div>
     </div>
     <div class="trigger">
+        
+          
+          <a class="page-link" href="/2014-12-2-LearnLinux3.html">Linux高性能服务器编程-读书笔记-CH4</a>
+          
         
           
           <a class="page-link" href="/about/">About</a>
@@ -58,22 +63,41 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <h1 id="paul-graham">黑客与画家 · Paul Graham</h1>
+        <h1 id="linux">Linux高性能服务器编程</h1>
 <blockquote>
-  <blockquote>
-    <p>edit by Elaine -2014-11-09    </p>
-  </blockquote>
+  <p>Edit by Elaine @2014.12.2</p>
 </blockquote>
 
-<ul>
-  <li>程序是写给人看的，附带能在机器上运行。  </li>
-  <li>触怒他人的言论是那些可能会有人相信的言论。  最令人暴跳如雷的言论，就是被认为说出了真相的言论。    </li>
-  <li>自由思考比畅所欲言更重要。    </li>
-  <li>如果自己就是潮水的一部分，怎么能看见潮流的方向呢？你只能永远保持质疑。  </li>
-  <li>安全问题的关键在于不要有漏洞，而不是任何设计上的决策。  </li>
-  <li>财富才是你的目标，金钱不是。  金钱是财富的一种简便的表达方式。  </li>
-</ul>
+<h3 id="tcpipinternetweb">第4章 TCP/IP通信案例：访问Internet上的web服务器</h3>
+<p>####一些概念：<br />
+* 正向代理服务器：要求客户端自己设置代理服务器的地址。每次请求都将直接发送到该代理服务器，并由代理服务器来请求目标资源。  <br />
+* 反向代理服务器：设置在服务器端，客户端无须进行任何设置。用代理服务器来接收Internet上的连接请求，将请求转发给内部网络上的服务器，并将从内部服务器上得到的结果返回给客户端。  <br />
+    &gt;正向代理服务器与客户端在同一个逻辑网络中，反向代理服务器与服务器在同一个逻辑网络中。  <br />
+* 透明代理服务器：只能设置在网关上。可看做正向代理的一种特殊情况。<br />
+&gt;代理服务器通常还提供缓存目标资源的功能。    </p>
 
+<h4 id="http-">HTTP服务 通信过程</h4>
+<ul>
+  <li>访问DNS服务器     </li>
+  <li>本地名称查询    </li>
+  <li>
+    <p>HTTP通信    </p>
+
+    <p>HTTP请求：<br />
+  1. 短连接：请求处理完后立即关闭连接。同一个客户的多个HTTP请求不能共用一个TCP连接。<br />
+  2. 长连接：多个请求可以使用同一个TCP连接。极大减少了网络上由于建立TCP连接导致的负荷，减少处理时间。</p>
+
+    <p>HTTP应答：  <br />
+  &gt;100 continue  通知客户端继续发送数据；<br />
+  &gt;200 OK 请求成功； <br />
+  &gt;3xx 重定向；
+  &gt;4xx 客户端错误； <br />
+  &gt;5xx 服务器错误；</p>
+
+    <p>Cookie:<br />
+  HTTP的无状态特性（无上下文），使得交互程序不方便承上启下。cookie是服务器发送给客户端的特殊信息，客户端每次发送给服务器的请求都需要带上这些信息，服务器就可以区分不同客户，基于浏览器的自动登录就是用cookie实现的。   </p>
+  </li>
+</ul>
 
       </div>
     </div>

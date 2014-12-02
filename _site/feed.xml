@@ -6,9 +6,57 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 01 Dec 2014 13:37:58 +0800</pubDate>
-    <lastBuildDate>Mon, 01 Dec 2014 13:37:58 +0800</lastBuildDate>
+    <pubDate>Tue, 02 Dec 2014 20:56:05 +0800</pubDate>
+    <lastBuildDate>Tue, 02 Dec 2014 20:56:05 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
+    
+      <item>
+        <title>Linux高性能服务器编程-读书笔记-CH4</title>
+        <description>&lt;h1 id=&quot;linux&quot;&gt;Linux高性能服务器编程&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Elaine @2014.12.2&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;tcpipinternetweb&quot;&gt;第4章 TCP/IP通信案例：访问Internet上的web服务器&lt;/h3&gt;
+
+&lt;h4 id=&quot;section&quot;&gt;一些概念：&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;正向代理服务器：要求客户端自己设置代理服务器的地址。每次请求都将直接发送到该代理服务器，并由代理服务器来请求目标资源。    &lt;/li&gt;
+  &lt;li&gt;反向代理服务器：设置在服务器端，客户端无须进行任何设置。用代理服务器来接收Internet上的连接请求，将请求转发给内部网络上的服务器，并将从内部服务器上得到的结果返回给客户端。  &lt;br /&gt;
+  &amp;gt;正向代理服务器与客户端在同一个逻辑网络中，反向代理服务器与服务器在同一个逻辑网络中。    &lt;/li&gt;
+  &lt;li&gt;透明代理服务器：只能设置在网关上。可看做正向代理的一种特殊情况。&lt;br /&gt;
+&amp;gt;代理服务器通常还提供缓存目标资源的功能。    &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;http-&quot;&gt;HTTP服务 通信过程&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;访问DNS服务器     &lt;/li&gt;
+  &lt;li&gt;本地名称查询    &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;HTTP通信    &lt;/p&gt;
+
+    &lt;p&gt;HTTP请求：&lt;br /&gt;
+  1. 短连接：请求处理完后立即关闭连接。同一个客户的多个HTTP请求不能共用一个TCP连接。&lt;br /&gt;
+  2. 长连接：多个请求可以使用同一个TCP连接。极大减少了网络上由于建立TCP连接导致的负荷，减少处理时间。&lt;/p&gt;
+
+    &lt;p&gt;HTTP应答：  &lt;br /&gt;
+  &amp;gt;100 continue  通知客户端继续发送数据；&lt;br /&gt;
+  &amp;gt;200 OK 请求成功； &lt;br /&gt;
+  &amp;gt;3xx 重定向；
+  &amp;gt;4xx 客户端错误； &lt;br /&gt;
+  &amp;gt;5xx 服务器错误；&lt;/p&gt;
+
+    &lt;p&gt;Cookie:&lt;br /&gt;
+  HTTP的无状态特性（无上下文），使得交互程序不方便承上启下。cookie是服务器发送给客户端的特殊信息，客户端每次发送给服务器的请求都需要带上这些信息，服务器就可以区分不同客户，基于浏览器的自动登录就是用cookie实现的。   &lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Tue, 02 Dec 2014 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2014/12/02/LearnLinux3.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2014/12/02/LearnLinux3.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>直面生死</title>
@@ -38,7 +86,7 @@
 
 &lt;p&gt;我不敢说人人都是积极向上的，但人这种生物，在进化的过程中，除了学会了希望，还学会了羞耻心。相信总有绝大多数的人，不会愿意去做那个拖后腿的，这也是人类得以进步的保障。   &lt;/p&gt;
 
-&lt;h3 id=&quot;section-4&quot;&gt;&lt;em&gt;最困难的不是面对各种挫折打击，而是面对各种挫折打击，却不是去对人世的热情&lt;/em&gt;&lt;/h3&gt;
+&lt;h3 id=&quot;section-4&quot;&gt;&lt;em&gt;最困难的不是面对各种挫折打击，而是面对各种挫折打击，却不失去对人世的热情&lt;/em&gt;&lt;/h3&gt;
 &lt;p&gt;柯文哲以这句话作为演讲的结束语。  &lt;br /&gt;
 年轻的时候，总探讨这些人生的大哲学是否太过老成？非也，传统观念中年迈之时才来讨论生死，正是因为我们绝大多数都是凡人，那时已有太多的无能为力。&lt;br /&gt;
 所以能在初入社会的时候，就听到前辈这样的道理，并能从中领悟一二，也是一大幸运，不得不感谢这世上总有智者。  &lt;/p&gt;
