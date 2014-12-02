@@ -6,8 +6,8 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 02 Dec 2014 20:56:05 +0800</pubDate>
-    <lastBuildDate>Tue, 02 Dec 2014 20:56:05 +0800</lastBuildDate>
+    <pubDate>Tue, 02 Dec 2014 20:57:54 +0800</pubDate>
+    <lastBuildDate>Tue, 02 Dec 2014 20:57:54 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
     
       <item>
@@ -39,12 +39,15 @@
   1. 短连接：请求处理完后立即关闭连接。同一个客户的多个HTTP请求不能共用一个TCP连接。&lt;br /&gt;
   2. 长连接：多个请求可以使用同一个TCP连接。极大减少了网络上由于建立TCP连接导致的负荷，减少处理时间。&lt;/p&gt;
 
-    &lt;p&gt;HTTP应答：  &lt;br /&gt;
-  &amp;gt;100 continue  通知客户端继续发送数据；&lt;br /&gt;
-  &amp;gt;200 OK 请求成功； &lt;br /&gt;
-  &amp;gt;3xx 重定向；
-  &amp;gt;4xx 客户端错误； &lt;br /&gt;
-  &amp;gt;5xx 服务器错误；&lt;/p&gt;
+    &lt;p&gt;HTTP应答：    &lt;/p&gt;
+
+    &lt;blockquote&gt;
+      &lt;p&gt;100 continue  通知客户端继续发送数据；    &lt;br /&gt;
+200 OK 请求成功； &lt;br /&gt;
+3xx 重定向；
+4xx 客户端错误； &lt;br /&gt;
+5xx 服务器错误；&lt;/p&gt;
+    &lt;/blockquote&gt;
 
     &lt;p&gt;Cookie:&lt;br /&gt;
   HTTP的无状态特性（无上下文），使得交互程序不方便承上启下。cookie是服务器发送给客户端的特殊信息，客户端每次发送给服务器的请求都需要带上这些信息，服务器就可以区分不同客户，基于浏览器的自动登录就是用cookie实现的。   &lt;/p&gt;
