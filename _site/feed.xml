@@ -6,8 +6,8 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 02 Dec 2014 20:57:54 +0800</pubDate>
-    <lastBuildDate>Tue, 02 Dec 2014 20:57:54 +0800</lastBuildDate>
+    <pubDate>Wed, 03 Dec 2014 13:09:59 +0800</pubDate>
+    <lastBuildDate>Wed, 03 Dec 2014 13:09:59 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
     
       <item>
@@ -22,10 +22,20 @@
 &lt;h4 id=&quot;section&quot;&gt;一些概念：&lt;/h4&gt;
 &lt;ul&gt;
   &lt;li&gt;正向代理服务器：要求客户端自己设置代理服务器的地址。每次请求都将直接发送到该代理服务器，并由代理服务器来请求目标资源。    &lt;/li&gt;
-  &lt;li&gt;反向代理服务器：设置在服务器端，客户端无须进行任何设置。用代理服务器来接收Internet上的连接请求，将请求转发给内部网络上的服务器，并将从内部服务器上得到的结果返回给客户端。  &lt;br /&gt;
-  &amp;gt;正向代理服务器与客户端在同一个逻辑网络中，反向代理服务器与服务器在同一个逻辑网络中。    &lt;/li&gt;
-  &lt;li&gt;透明代理服务器：只能设置在网关上。可看做正向代理的一种特殊情况。&lt;br /&gt;
-&amp;gt;代理服务器通常还提供缓存目标资源的功能。    &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;反向代理服务器：设置在服务器端，客户端无须进行任何设置。用代理服务器来接收Internet上的连接请求，将请求转发给内部网络上的服务器，并将从内部服务器上得到的结果返回给客户端。   &lt;/p&gt;
+
+    &lt;blockquote&gt;
+      &lt;p&gt;正向代理服务器与客户端在同一个逻辑网络中，反向代理服务器与服务器在同一个逻辑网络中。    &lt;/p&gt;
+    &lt;/blockquote&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;透明代理服务器：只能设置在网关上。可看做正向代理的一种特殊情况。  &lt;/p&gt;
+
+    &lt;blockquote&gt;
+      &lt;p&gt;代理服务器通常还提供缓存目标资源的功能。    &lt;/p&gt;
+    &lt;/blockquote&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h4 id=&quot;http-&quot;&gt;HTTP服务 通信过程&lt;/h4&gt;
