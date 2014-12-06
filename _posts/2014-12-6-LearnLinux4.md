@@ -7,10 +7,10 @@ title: Linux高性能服务器编程-读书笔记-CH5
  
 ###第五章 Linux网络编程基础API    
 * socket地址API    
-    >* **字节序**：大端：高位存在低地址；小端：低位存在低地址  ；
-    >* 大多数PC采用小端字节序，因此小端字节序又称为主机字节序；   
-    >* 网络发送端总是把数据转换为大端字节序，接收端机器根据自己的字节序决定是否转换。大端字节序又称为网络字节序。   
-    >* JAVA虚拟机采用大端字节序。   
+    > * **字节序**：大端：高位存在低地址；小端：低位存在低地址  ；  
+    > * 大多数PC采用小端字节序，因此小端字节序又称为主机字节序；   
+    > * 网络发送端总是把数据转换为大端字节序，接收端机器根据自己的字节序决定是否转换。大端字节序又称为网络字节序。   
+    > * JAVA虚拟机采用大端字节序。   
 
 
 * 创建Socket      
@@ -68,9 +68,9 @@ title: Linux高性能服务器编程-读书笔记-CH5
            
  ---    
  
-         #include <sys/socket.h>   
-         int shutdown( int sockfd, int howto );    
-         /* 立即关闭连接。howto决定shutdown行为 */       
+          #include <sys/socket.h>   
+          int shutdown( int sockfd, int howto );    
+          /* 立即关闭连接。howto决定shutdown行为 */       
 
 * 数据读写   
     TCP数据读写   
