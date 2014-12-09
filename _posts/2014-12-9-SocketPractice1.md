@@ -3,6 +3,7 @@ layout : default
 title : Socket API 编程实践（1）
 ---
 # Socket API 编程实践（1） 
+
 ### 这集副标题是 *菜鸟的丢人史*  
 > Edit by Elaine @ 2014-12-9   
 
@@ -100,7 +101,7 @@ title : Socket API 编程实践（1）
 		#include <iostream>
 		using namespace std;
 
-		#define BUFFER_SIZE 2048
+		#define BUFFER_SIZE 1024
 
 		int main(int argc, char* argv[]) {
 			if (argc <= 2) {
@@ -140,4 +141,5 @@ title : Socket API 编程实践（1）
 		}
 		
 ---
+
 ##就当我在卖萌吧...
