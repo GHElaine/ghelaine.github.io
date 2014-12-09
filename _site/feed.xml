@@ -6,9 +6,128 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 03 Dec 2014 13:09:59 +0800</pubDate>
-    <lastBuildDate>Wed, 03 Dec 2014 13:09:59 +0800</lastBuildDate>
+    <pubDate>Mon, 08 Dec 2014 22:50:45 +0800</pubDate>
+    <lastBuildDate>Mon, 08 Dec 2014 22:50:45 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
+    
+      <item>
+        <title>Linux高性能服务器编程-读书笔记-CH5</title>
+        <description>&lt;h1 id=&quot;linux&quot;&gt;Linux高性能服务器编程&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Elaine @2014.12.6&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;linuxapi&quot;&gt;第五章 Linux网络编程基础API&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;socket地址API  &lt;br /&gt;
+  &amp;gt; * &lt;strong&gt;字节序&lt;/strong&gt;：大端：高位存在低地址；小端：低位存在低地址  ；&lt;br /&gt;
+  &amp;gt; * 大多数PC采用小端字节序，因此小端字节序又称为主机字节序； &lt;br /&gt;
+  &amp;gt; * 网络发送端总是把数据转换为大端字节序，接收端机器根据自己的字节序决定是否转换。大端字节序又称为网络字节序。 &lt;br /&gt;
+  &amp;gt; * JAVA虚拟机采用大端字节序。   &lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;创建Socket    &lt;br /&gt;
+  使用Linux系统调用即可，注意参数。    &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/types.h&amp;gt;      
+  int socket( int domain, int type, int protocol) ;     
+  /* domain: 协议族 ；  
+   * type: 服务类型；  
+   * protocol: 具体的协议;   */
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;命名 Socket  &lt;br /&gt;
+  将一个socket与socket地址绑定称为给socket命名。
+  服务器程序中，只有命名后，客户端才知道如何连接它。  &lt;br /&gt;
+  客户端不需要命名socket而是匿名，操作系统会自动分配socket地址。  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/types.h&amp;gt;   
+  #include &amp;lt;sys/socket.h&amp;gt;   
+  int bind( int sockfd, const struct sockaddr* my_addr, socklen_t addrlen );     
+  /* 将my_addr所指的socket地址分配给未命名的sockfd文件描述符，addrlen参数指出该socket地址的长度。     
+  * 失败时返回值：  EACCES: 被绑定的地址是受保护地址，进超级用户能够访问。EADDRINUSE：被绑定的地址正在使用中。*/        
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;监听 Socket &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/socket.h&amp;gt;  
+  int listen ( int sockfd, int backlog ) ;    
+  /* sockfd: 被监听的socket    
+   * backlog: 提示内核监听队列的最大长度  */     
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;接受连接  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include  &amp;lt;sys/types.h&amp;gt;   
+  #include &amp;lt;sys/socket.h&amp;gt;   
+  int accept ( int sockfd, struct sockaddr *addr, socklen_t *addrlen)   
+  /* sockfd：执行通过listen系统调用的监听socket;   
+   * addr: 用来获取被接受连接的远端socket地址；   
+   * 成功时返回一个新的连接socket，唯一标识了被接收的这个连接，服务器可通过读写该socket来与被接受连接对应的客户端通信。*/       
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;发起连接  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/types.h&amp;gt;  
+  #include &amp;lt;sys/socket.h&amp;gt;    
+  int connect (int sockfd, const struct sockaddr *serv_addr, socklen_t addrlen);    
+  /* sockfd: 由socket系统调用返回一个socket；   
+   * serv_addr:服务器监听的socket地址；   
+   * addrlen: 指定地址的长度；  */
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;关闭连接  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;   #include &amp;lt;unistd.h&amp;gt;   
+   int close( int fd);   
+   /* 每次调用，将fd引用次数减一；
+    * 直到为0时，真正关闭连接 */     
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;pre&gt;&lt;code&gt;      #include &amp;lt;sys/socket.h&amp;gt;   
+      int shutdown( int sockfd, int howto );    
+      /* 立即关闭连接。howto决定shutdown行为 */       
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;数据读写 &lt;br /&gt;
+  TCP数据读写   &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/types.h&amp;gt; 
+  #include &amp;lt;sys/socket.h&amp;gt;  
+  ssize_t recv( int sockfd, void *buf, size_t len, int flags ); 
+  ssize_t send( int sockfd, const void *buf, size_t len, int flag );     
+&lt;/code&gt;&lt;/pre&gt;
+
+    &lt;p&gt;通用数据读写  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/socket.h&amp;gt;   
+  ssize_t recvmsg(int sockfd, struct msghdr* msg,  int flags) 
+  ssize_t sendmsg(int sockfd, struct msghdr* msg, int flags)     
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;Socket API太多了，不再赘述。其中很多参数必须要靠真正的编程实践才能体会其作用，等我的老联想本本的ubuntu装起了，好好写点代码实验下。有种老家伙迎来第二春的快感，毕竟已经废弃它了几个月了。&lt;/strong&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sat, 06 Dec 2014 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2014/12/06/LearnLinux4.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2014/12/06/LearnLinux4.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Linux高性能服务器编程-读书笔记-CH4</title>
@@ -54,7 +173,7 @@
     &lt;blockquote&gt;
       &lt;p&gt;100 continue  通知客户端继续发送数据；    &lt;br /&gt;
 200 OK 请求成功； &lt;br /&gt;
-3xx 重定向；
+3xx 重定向；&lt;br /&gt;
 4xx 客户端错误； &lt;br /&gt;
 5xx 服务器错误；&lt;/p&gt;
     &lt;/blockquote&gt;
@@ -272,6 +391,13 @@ IPV6并不是IPV4的简单扩展，而是完全不同的协议， 除了解决IP
   &lt;li&gt;如果自己就是潮水的一部分，怎么能看见潮流的方向呢？你只能永远保持质疑。  &lt;/li&gt;
   &lt;li&gt;安全问题的关键在于不要有漏洞，而不是任何设计上的决策。  &lt;/li&gt;
   &lt;li&gt;财富才是你的目标，金钱不是。  金钱是财富的一种简便的表达方式。  &lt;/li&gt;
+  &lt;li&gt;好设计是简单的设计。当你被迫把东西做得很简单时，你就被迫直接面对真正的问题。&lt;/li&gt;
+  &lt;li&gt;软件的难题通常可以被改成等价的较易解决的形式。&lt;/li&gt;
+  &lt;li&gt;并非所有的艰苦都是值得的。世界上有有益的痛苦，也有无益的痛苦。你需要的是咬牙向前冲刺的痛苦，而不是脚被钉子扎破的痛苦。&lt;/li&gt;
+  &lt;li&gt;在大多数领域，看上去容易的事情，背后都需要大量的练习。练习的作用也许是训练你把刻意为之的事情变成一种自觉的行为。&lt;/li&gt;
+  &lt;li&gt;我想，最伟大的大师最终会达到一种超脱自我的境界。他们一心想找到正确答案，如果别人已经回答出了一部分，那就没理由不拿来用。他们足够自信地使用他人的成果，完全不担心因此丧失个人的特点。&lt;/li&gt;
+  &lt;li&gt;推动人才成批涌现的最大因素就是，让有天赋的人聚在一起，共同解决某个难题。在历史的任何时刻都有一些热点项目，一些团体在这些项目上做出伟大的成绩。如果你远离这些中心，几乎不可能单靠自己就取得伟大成果。&lt;/li&gt;
+  &lt;li&gt;单单是无法容忍丑陋的东西还不够，只有对这个领域非常熟悉，你才可能发现哪些地方可以动手改进。你必须锻炼自己。只有在成为某个领域的专家之后，你才会听到心里有一个细微的声音说：“这样解决太糟糕了！一定有更好的选择。”不要忽视这种声音，要培育它们。优秀作品的秘诀就是：非常严格的品味，再加上实现这种品味的能力。  &lt;/li&gt;
 &lt;/ul&gt;
 
 </description>
