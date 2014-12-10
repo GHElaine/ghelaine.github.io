@@ -4,7 +4,7 @@ title : Socket API 编程实践（1）
 ---
 # Socket API 编程实践（1） 
 
-### 这集副标题是 *菜鸟的丢人史*  
+## 这集副标题是 *菜鸟的丢人史*  
 > Edit by Elaine @ 2014-12-9   
 
 这几天看论文看的有些头痛，想着还是写写代码轻松一下，没想到还是遇到了各种问题。作为一个初学Linux网络编程的菜鸟，表示有些东西，理论背的再熟练，都不及动手写一个代码长记性。   
@@ -74,11 +74,11 @@ title : Socket API 编程实践（1）
 			/* if (connect(sockfd, (struct sockaddr*)&address, sizeof(address)) < 0) {
 			 	printf("connect failed\n");
 			 	return -1;
-			 } 
-			else {
+			 } */
+			//else {
 				const char* buffer = "hello Elaine";
-				sendto(sockfd, buffer, sizeof(buffer), 0, (sockaddr*)&address, sizeof(address));
-			}*/
+				sendto(sockfd, buffer, strlen(buffer), 0, (sockaddr*)&address, sizeof(address));
+			//}
 			close(sockfd);
 			return 0;
 
@@ -129,17 +129,17 @@ title : Socket API 编程实践（1）
 			/* int connfd = accept(sock, (struct sockaddr*)&client, &client_addrlength);
 			 if (connfd < 0) {
 			 	printf("errno is %d\n", errno);
-			 }
-			 else {
+			 }*/
+			// else {
 				char buffer[BUFFER_SIZE];
 				memset(buffer,'\0',sizeof(buffer));
 				ret = recvfrom(sock, buffer, BUFFER_SIZE-1, 0, (struct sockaddr*)&client, &client_addrlength);
 				printf("got %d bytes of udp data '%s' \n", ret, buffer);
-			}*/
+			//}
 			close(sock);
 			return 0;
 		}
 		
 ---
 
-##就当我在卖萌吧...
+## 就当我在卖萌吧...

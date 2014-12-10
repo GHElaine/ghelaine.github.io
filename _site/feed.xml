@@ -6,9 +6,169 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 08 Dec 2014 22:50:45 +0800</pubDate>
-    <lastBuildDate>Mon, 08 Dec 2014 22:50:45 +0800</lastBuildDate>
+    <pubDate>Wed, 10 Dec 2014 15:04:19 +0800</pubDate>
+    <lastBuildDate>Wed, 10 Dec 2014 15:04:19 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
+    
+      <item>
+        <title>Socket API 编程实践（1）</title>
+        <description>&lt;h1 id=&quot;socket-api-1&quot;&gt;Socket API 编程实践（1）&lt;/h1&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;这集副标题是 &lt;em&gt;菜鸟的丢人史&lt;/em&gt;&lt;/h2&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Elaine @ 2014-12-9   &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这几天看论文看的有些头痛，想着还是写写代码轻松一下，没想到还是遇到了各种问题。作为一个初学Linux网络编程的菜鸟，表示有些东西，理论背的再熟练，都不及动手写一个代码长记性。   &lt;/p&gt;
+
+&lt;p&gt;这段时间，《Linux高性能服务器编程》看到了第五章，深感唯有动手编码才能领会各种协议和Socket的精髓。抄了书上几个例子，竟然有因为抄错代码运行不出正确结果而纠结了一天的荒唐事发生，真是无颜号称自己是计算机专业的学生。究其原因，无非是自己只是把书上的理论看过了，却没能实际理解，抄了书上的代码，却没有逐句去琢磨每行代码的作用。   &lt;/p&gt;
+
+&lt;p&gt;今晚，想着从书上给的TCP的发送/接收数据的例子稍微扩展一下，写个UDP的玩玩，本想着完全没有难度，因为Socket API几乎已经完成了绝绝大多数工作，只需要把逻辑理清楚就行了。结果……啊唏……  &lt;/p&gt;
+
+&lt;p&gt;先说我理解的&lt;strong&gt;TCP发送和接收数据&lt;/strong&gt;的过程：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;发送端：  &lt;/p&gt;
+
+    &lt;p&gt;1.读取服务器（目的主机）IP，Port，转换为&lt;code&gt;sockaddr_in&lt;/code&gt;。这里注意三个字段：&lt;code&gt;sin_family&lt;/code&gt;, &lt;code&gt;sin_addr&lt;/code&gt;, &lt;code&gt;sin_port&lt;/code&gt;: TCP/IP协议族的&lt;code&gt;sin_family&lt;/code&gt;指定为&lt;code&gt;AF_INET&lt;/code&gt;； &lt;code&gt;sin_addr&lt;/code&gt;才是真正存放转换后的IP地址的字段； &lt;code&gt;sin_port&lt;/code&gt;存放转换后的端口号。（&lt;strong&gt;转换指转为网络字节序&lt;/strong&gt;） &lt;br /&gt;
+  2.建立Socket。&lt;code&gt;socket&lt;/code&gt;系统调用，第二个参数指定为&lt;code&gt;SOCK_STREAM&lt;/code&gt;时为TCP协议，数据流。 返回值非负时成功建立socket。&lt;br /&gt;
+  3.请求连接。&lt;code&gt;connect&lt;/code&gt;系统调用，返回值小于0时，连接失败。否则即可发送数据，&lt;strong&gt;此时三次握手已经完成&lt;/strong&gt;。&lt;br /&gt;
+  4.发送数据。&lt;code&gt;send&lt;/code&gt;系统调用，可发送&lt;code&gt;normal_data&lt;/code&gt;（正常数据）和&lt;code&gt;oob_data&lt;/code&gt;（TCP带外数据，紧急数据）。
+  5.数据发完，关闭连接。  &lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;接收端：&lt;br /&gt;
+  1.读取服务器程序IP，Port，转换为&lt;code&gt;sockadd_in&lt;/code&gt;。注意字段同发送端。&lt;br /&gt;
+  2.建立socket，&lt;code&gt;socket&lt;/code&gt;系统调用。 &lt;br /&gt;
+  3.绑定地址。&lt;code&gt;bind&lt;/code&gt;系统调用，绑定&lt;code&gt;sockfd&lt;/code&gt;与服务器程序地址（&lt;code&gt;sockadd_in&lt;/code&gt;类型的地址）。&lt;br /&gt;
+  4.监听端口。&lt;code&gt;listen&lt;/code&gt;系统调用。监听服务器程序所在端口（根据&lt;code&gt;sockfd&lt;/code&gt;）。
+  5.接受连接。&lt;code&gt;accept&lt;/code&gt;系统调用。&lt;strong&gt;此时三次握手至少已完成前两次握手&lt;/strong&gt;。&lt;br /&gt;
+  6.接受数据。&lt;code&gt;recv&lt;/code&gt;系统调用。第三个参数可选&lt;code&gt;MSG_OOB&lt;/code&gt;表示带外紧急数据，0表示普通数据。 &lt;br /&gt;
+  7.数据传送结束，关闭连接。    &lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;今天写的UDP传送数据的过程与TCP过程有相似之处，但有巨大的差异，建立socket的参数不同，发送接收的系统调用函数不同，不再赘述。&lt;br /&gt;
+两个协议虽然逻辑都不复杂，差异也很明显：&lt;strong&gt;TCP面向连接，数据可靠，基于字节流；而UDP无连接，不可靠，基于数据报&lt;/strong&gt;。但是写起代码来，居然忘了这些，只一味模仿TCP，简直汗颜。直到代码运行后，始终在listen之后提示错误，半天才意识到，UDP是无连接的，不用侦听端口，只需要绑定地址之后就开始传送数据了，自然也不存在接收端的接受连接，和发送端的请求连接。  &lt;/p&gt;
+
+&lt;p&gt;为了提醒自己UDP无连接的特性，还是将代码中错误的部分保留，仅用注释标记：   &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	// SEND 
+	#include &amp;lt;sys/types.h&amp;gt;
+	#include &amp;lt;sys/socket.h&amp;gt;
+	#include &amp;lt;libgen.h&amp;gt;
+	#include &amp;lt;assert.h&amp;gt;
+	#include &amp;lt;errno.h&amp;gt;
+	#include &amp;lt;stdlib.h&amp;gt;
+	#include &amp;lt;stdio.h&amp;gt;
+	#include &amp;lt;netinet/in.h&amp;gt;
+	#include &amp;lt;arpa/inet.h&amp;gt;
+	#include &amp;lt;unistd.h&amp;gt;
+	#include &amp;lt;string.h&amp;gt;
+
+	#define BUFFER_SIZE 1024
+
+	int main(int argc, char* argv[]) {
+		if (argc &amp;lt;= 2) {
+			printf (&quot;usage: %s ip_address, port number.\n&quot;, basename(argv[0]));
+			return 1;
+		}
+		
+		int port = atoi(argv[2]);
+		const char* ip = argv[1];
+
+		struct sockaddr_in address;
+		bzero(&amp;amp;address, sizeof(address));
+		address.sin_family = AF_INET;
+		inet_pton(AF_INET, ip, &amp;amp;address.sin_addr);
+		address.sin_port = htons(port);
+
+		int sockfd = socket(PF_INET, SOCK_DGRAM, 0);
+		assert(sockfd &amp;gt;= 0);
+
+		
+		/* if (connect(sockfd, (struct sockaddr*)&amp;amp;address, sizeof(address)) &amp;lt; 0) {
+		 	printf(&quot;connect failed\n&quot;);
+		 	return -1;
+		 } */
+		//else {
+			const char* buffer = &quot;hello Elaine&quot;;
+			sendto(sockfd, buffer, strlen(buffer), 0, (sockaddr*)&amp;amp;address, sizeof(address));
+		//}
+		close(sockfd);
+		return 0;
+
+	}   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;pre&gt;&lt;code&gt;	// RECV  
+	#include &amp;lt;sys/socket.h&amp;gt;
+	#include &amp;lt;sys/types.h&amp;gt;
+	#include &amp;lt;netinet/in.h&amp;gt;
+	#include &amp;lt;arpa/inet.h&amp;gt;
+	#include &amp;lt;assert.h&amp;gt;
+	#include &amp;lt;stdio.h&amp;gt;
+	#include &amp;lt;unistd.h&amp;gt;
+	#include &amp;lt;stdlib.h&amp;gt;
+	#include &amp;lt;errno.h&amp;gt;
+	#include &amp;lt;string.h&amp;gt;
+	#include &amp;lt;libgen.h&amp;gt;
+	#include &amp;lt;iostream&amp;gt;
+	using namespace std;
+
+	#define BUFFER_SIZE 1024
+
+	int main(int argc, char* argv[]) {
+		if (argc &amp;lt;= 2) {
+			printf(&quot;usage:%s ip_address, port number\n&quot;, basename(argv[0]));
+			return 1;
+		}
+		const char* ip = argv[1];
+		int port = atoi(argv[2]);
+
+		struct sockaddr_in address;
+		bzero(&amp;amp;address, sizeof(address));
+		address.sin_family = AF_INET;
+		inet_pton(AF_INET, ip , &amp;amp;address.sin_addr);
+		address.sin_port = htons(port);			int sock = socket(AF_INET, SOCK_DGRAM, 0);
+		assert(sock &amp;gt;= 0);
+
+		int ret = bind(sock, (struct sockaddr*)&amp;amp;address, sizeof(address));
+		assert(ret != -1);
+
+		//ret = listen(sock, 5);
+
+		struct sockaddr_in client;
+		socklen_t client_addrlength = sizeof(client);
+	
+		/* int connfd = accept(sock, (struct sockaddr*)&amp;amp;client, &amp;amp;client_addrlength);
+		 if (connfd &amp;lt; 0) {
+		 	printf(&quot;errno is %d\n&quot;, errno);
+		 }*/
+		// else {
+			char buffer[BUFFER_SIZE];
+			memset(buffer,&#39;\0&#39;,sizeof(buffer));
+			ret = recvfrom(sock, buffer, BUFFER_SIZE-1, 0, (struct sockaddr*)&amp;amp;client, &amp;amp;client_addrlength);
+			printf(&quot;got %d bytes of udp data &#39;%s&#39; \n&quot;, ret, buffer);
+		//}
+		close(sock);
+		return 0;
+	}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;就当我在卖萌吧…&lt;/h2&gt;
+</description>
+        <pubDate>Tue, 09 Dec 2014 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2014/12/09/SocketPractice1.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2014/12/09/SocketPractice1.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Linux高性能服务器编程-读书笔记-CH5</title>
