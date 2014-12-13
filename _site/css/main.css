@@ -274,7 +274,8 @@ pre {
   margin-left: -15px; }
 
 .footer-col {
-  float: left;
+  /*float: left;*/
+  float: right;
   margin-bottom: 15px;
   padding-left: 15px; }
 
@@ -308,7 +309,6 @@ pre {
  * Page content
  */
 .page-content {
-  /*background-image: url("/img/background.jpeg");*/
   padding: 30px 0; }
 
 .page-heading {
@@ -500,6 +500,16 @@ pre {
     color: #099; }
 
   /* duoshuo */
+#ds-reset .ds-avatar {
+  position:absolute;
+  top: 20px;
+  width: 31px;
+  height: 31px;
+  padding: 5px;
+  background: #FFFFFF;
+  border-radius: 50%;
+
+  }
 #ds-reset .ds-avatar img {
   width: 54px !important;
   height: 54px !important;
@@ -509,6 +519,14 @@ pre {
   -webkit-transition: -webkit-transform 0.4s ease-out;
   -moz-transition: -moz-transform 0.4s ease-out;
   transition: transform 0.4s ease-out;
+
+}
+#ds-reset .ds-avatar a {
+  display: block;
+  width: 31px;
+  height: 31px;
+  background: #F90707;
+  border-radius: 50%;
 }
 #ds-reset .ds-avatar img:hover {
   -webkit-transform: rotateZ(360deg);
@@ -517,4 +535,19 @@ pre {
 }
 #ds-reset .ds-powered-by {
   display: none;
+}
+#ds-thread {
+  background: #FFFFFF;
+}
+
+.ds-post-main {
+  position: relative;
+  width: 500px;
+}
+
+.ds-comment-body {
+  margin-left: 20px;
+  padding: 10px 10px 30px;
+  height: 80px;
+  background:  #01644F;
 }
