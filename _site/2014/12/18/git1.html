@@ -1,0 +1,198 @@
+<link href="/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all"></link>
+<!DOCTYPE html>
+ 
+<html>
+<head>
+ 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>git使用心得（1）</title>
+</head>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width initial-scale=1">
+
+  <title>git使用心得（1）</title>
+  <meta name="description" content="git使用心得（1）- “.gitignore”  Edit by Elaine @ 2014-12-18">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/2014/12/18/git1.html">
+  <link rel="alternate" type="application/atom+xml" title="Elaine's Blog" href="http://yourdomain.com/feed.xml" />
+  
+  <style id="fit-vids-style">
+  .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
+  </style>
+</head>
+
+
+  <body>
+
+    <header class="site-header" >
+  <div class="wrapper">
+    <div class="description">
+      <div>Leave something behind</div>
+      <div>keep moving forward</div>
+    </div>
+    <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+          <a class="page-link" href="/index.html">Elaine's blog</a>
+          
+        
+          
+        
+    </div>
+        
+  </div>
+
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <h1 id="git1--gitignore">git使用心得（1）- “.gitignore”</h1>
+<blockquote>
+  <p>Edit by Elaine @ 2014-12-18</p>
+</blockquote>
+
+<p>今天无意间看自己的github上socket编程的练习代码库，发现好多无用的可执行文件，于是想要将这些可执行文件忽略，就这么简单的一件事，折腾了将近两个小时。下面来记录一下心得，有些坑，踩一次就该把它填平了。  </p>
+
+<p>很明显，这事情.gitignore文件做起来最合适了。毫无疑问要修改这个文件。那么问题来了…  </p>
+
+<p><strong>什么情况下.gitignore是不起作用的？</strong><br />
+当第一次配置仓库的时候，没有把.gitignore文件配置合适，已经push过代码了，那么已经被跟踪的文件，.gitignore是无力忽略的。因此，初始化仓库的时候，应该有两个文件是被“习惯性添加”的，一个是“README.md”，另一个就是“.gitignore”。  </p>
+
+<p><strong>如果初始化的时候就是没配置好怎么办？我就是任性想修改忽略规则怎么办？</strong>   <br />
+1、<code>git rm -r --cached . </code> 可以帮助删除当前本地库中所有的文件跟踪，也就是缓存，但不会删除本地库中的代码。</p>
+
+<p><img src="/img/gitignore1.png" alt="image" />   </p>
+
+<p>2、<code>vi .gitignore</code> 修改.gitignore文件。记得保存。<br />
+3、<code>git add . </code> 不解释。<br />
+4、<code>git commit -m "restart .gitignore"</code>提交一次，此时.gitignore的新规则就生效了。  </p>
+
+<p><strong>注意，此处有坑！</strong><br />
+<strong>如果在上述步骤2过后，你不小心忽略了3直接执行了4，你会发现，你的代码库里的代码，被全部delete了。</strong> </p>
+
+<p><img src="/img/gitignore2.png" alt="image" /></p>
+
+<p>既然错误已经铸成，就只能把还没同步的代码（其实是workspace现有的所有代码），<code>git add . </code>重新加进跟踪吧… </p>
+
+<p><img src="/img/gitignore4.png" alt="image" /></p>
+
+<p>多亏我这个workspace只是用来存一些小代码，基本不存在版本控制的问题否则的话，呵呵…    </p>
+
+<p>其实误操作导致的代码被删除，还是可以通过撤销commit找回来的。具体方法在这<a href="http://git-scm.com/book/zh/ch9-7.html">git数据维护及恢复</a></p>
+
+<p><strong>说说.gitignore文件里面写什么</strong> <br />
+* 忽略某些后缀的文件（比如.exe）：*.exe<br />
+* 忽略某个文件夹中的所有文件（比如文件夹a下）：a/*<br />
+* 指定跟踪某个后缀的文件（比如.cpp），即使文件所在位置的其他文件都被忽略：!*.cpp<br />
+* 说个特殊的，整个workspace中，只想跟踪某指定类型的文件（比如.cpp）：    </p>
+
+<pre><code>    /*   
+    !*.cpp
+</code></pre>
+
+<hr />
+<p>嗯，现在愈发觉得git是个好东西了。觉得不好用的时候，是自己没用熟练，也没习惯而已。还是玩不转，还是有很多坑等着我去踩，还是慢慢来吧。</p>
+
+
+        <!-- 多说评论框 start -->
+        <div class="ds-thread" data-thread-key="git使用心得（1）" data-title="git使用心得（1）" data-url="/2014/12/18/git1.html"></div>
+        <!-- 多说评论框 end -->
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+          <li><a href="/">Elaine's Blog</a></li>
+          <li><a href="mailto:gaohuielaine@gmail.com">gaohuielaine@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col  footer-col-2"></div>
+      <div class="footer-col  footer-col-3">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/GHElaine">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">GHElaine</span>
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/G.Elaine">
+              <span class="icon  icon--twitter">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809
+                  c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+                </svg>
+              </span>
+
+              <span class="username">G.Elaine</span>
+            </a>
+          </li>
+          
+        </ul>
+        
+      </div>
+    </div>
+   
+      <div class="footer-col-wrapper">
+        <p class="motto">Leave something behind, keep moving forward.
+</p>
+        <p class="copyright">Copyright@2014-Elaine</p>
+      </div>
+  <!-- </div> -->
+
+</footer>
+
+
+  </body>
+
+</html>
+<script type="text/javascript" src="/google-code-prettify/prettify.js"></script>
+<script type="text/javascript" src="/js/jquery.1.8.0.js"></script>
+
+<script type="text/javascript">
+$(function() {
+  $("pre").addClass("prettyprint");
+  prettyPrint();
+});
+</script> 
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"ghelaine"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
