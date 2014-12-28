@@ -6,9 +6,188 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 18 Dec 2014 02:34:14 +0800</pubDate>
-    <lastBuildDate>Thu, 18 Dec 2014 02:34:14 +0800</lastBuildDate>
+    <pubDate>Sun, 28 Dec 2014 23:59:47 +0800</pubDate>
+    <lastBuildDate>Sun, 28 Dec 2014 23:59:47 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
+    
+      <item>
+        <title>Linux高性能服务器编程-读书笔记-CH7</title>
+        <description>&lt;h1 id=&quot;linux&quot;&gt;Linux高性能服务器编程&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Elaine @2014.12.28&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;linux-1&quot;&gt;第七章 Linux服务器程序规范&lt;/h3&gt;
+
+&lt;p&gt;​* 日志&lt;br /&gt;
+    Linux系统提供守护进程syslogd或rsyslogd来处理系统日志。服务器调试和维护都需要日志系统。&lt;br /&gt;
+    分别使用syslog、printk函数将用户输出消息和内核消息输出到指定文件，syslogd或rsyslogd函数通过读取指定文件再输出到指定日志文件，来记录系统日志。 &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;syslog函数&lt;br /&gt;
+   用于和rsyslogd守护进程通信：&lt;/p&gt;
+
+    &lt;p&gt;#include &lt;syslog.h&gt;
+   void syslog( int priority, const char* message, ...);
+   /* 采用可变参数来结构化输出；*/  &lt;/syslog.h&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;日志掩码  &lt;br /&gt;
+  用于过滤系统调试时的日志。&lt;/p&gt;
+
+    &lt;p&gt;​#include &lt;syslog.h&gt;
+   ​int setlogmask( int maskpri);  
+   ​/* 日志级别大于maskpri的日志信息将被系统忽略*/   &lt;/syslog.h&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;​
+   * 关闭日志功能 &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    ​#include &amp;lt;syslog.h&amp;gt; 
+    ​void closelog();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;用户信息&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;	​​ #include &amp;lt;sys/types.h&amp;gt;    
+	​​ ​#include &amp;lt;unistd.h&amp;gt;
+	 ​uid_t getuid();         ​    ​    ​/* 获取真实用户ID */
+	 ​​uid_t geteuid();    ​    ​        ​/* 获取有效用户ID */​
+	 ​​gid_t getgid();    ​    ​    ​    ​/* 获取真实组ID */
+	 ​​​git_t getegit();    ​    ​    ​    ​/* 获取有效组ID */
+	 ​​​​int setuid(uid_t uid);    ​    ​   /* 设置真实用户ID */
+	 ​​​​​int seteuid(uid_t uid);    ​    ​  /* 设置有效用户ID */
+	 ​​​​​​int setgid(git_t gid);    ​    ​     /* 设置真实组ID */
+	 ​​​​​​int setegid(git_t gid);    ​    ​    /* 设置有效组ID */
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;一个进程拥有两个用户ID： UID和EUID。EUID为了方便资源访问，它可以使得用户拥有该程序的有效用户权限。&lt;/strong&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sun, 28 Dec 2014 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2014/12/28/LearnLinux6.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2014/12/28/LearnLinux6.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Linux高性能服务器编程-读书笔记-CH6</title>
+        <description>&lt;h1 id=&quot;linux&quot;&gt;Linux高性能服务器编程&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Elaine @2014.12.25&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;io&quot;&gt;第六章 高级I/O函数&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;CGI服务器工作原理：关闭标准输出文件描述符STDOUT_FILENO，复制socket文件描述符connfd，dup总是返回系统中最小的可用文件描述符，实际返回1。服务器输出到标准输出的内容会直接发送到与客户连接对应的socket上，因此printf调用的输出将被客户端获得，而不是显示在服务器程序的终端上。 &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;pipe函数&lt;br /&gt;
+  创建一个管道，实现进程间通信。  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;    #include &amp;lt;unistd.h&amp;gt;
+    int pipe( int fd[2] )
+    /* fd[0]和fd[1]分别是管道的两端。fd[0]只能用于读数据，fd[1]只能用于写数据。默认这一对文件描述符是阻塞的。*/   
+&lt;/code&gt;&lt;/pre&gt;
+
+    &lt;p&gt;创建双向管道。&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;    #include &amp;lt;sys/types.h&amp;gt;
+    #include &amp;lt;sys/socket.h&amp;gt;
+    int socketpair(int domain, int type, int protocol, int fd[2]);   
+    /* domain只能用UNIX本地协议族AF_UNIX */
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;dup函数和dup2函数 &lt;br /&gt;
+  标准输入输出重定向。  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;   #include &amp;lt;unistd.h&amp;gt;
+   int dup( int file_descriptor );
+   int dup2( int file_descriptor_one, int file_descriptor_two );  
+   /* dup创建一个新的文件描述符，该新文件描述符和原文件描述符file_descriptor指向相同的文件、管道或者网络连接，且返回的文件描述符总是取系统当前可用的最小整数值 */
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;readv和writev函数 &lt;br /&gt;
+  readv将数据从文件描述符读到分散的内存块中。writev将分散的内存数据写入文件描述符。  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;   #include &amp;lt;sys/uio.h&amp;gt;
+   ssize_t readv(int fd, const struct iovec* vector, int count);
+   ssize_t writev(int fd, const struct iovec* vector, int count);
+   /* fd是被操作的文件描述符，iovec* 指定一块内存区域。count是数组长度。*/
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;sendfile函数 &lt;br /&gt;
+  在两个文件描述符之间直接传递数据。直接在内核中操作，避免了内核缓冲区和用户缓冲区之间的数据拷贝。  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;   #include &amp;lt;sys/sendfile.h&amp;gt;
+   ssize_t sendfile(int out_fd, int in_fd, off_t* offset, size_t count);  
+   /* in_fd是待读取内容的文件描述符，必须支持mmap函数，不能是socket管道，out_fd是待写入文件描述符，必须是socket管道，offset指定读入文件流的位置，若为空则从起始位置读，count指定传输的字节数。*/  
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;mmap和munmap函数&lt;br /&gt;
+  mmap申请一段内存，将这段内存作为进程间通信的共享内存，也可以直接将文件映射到其中。 munmap负责释放由mmap申请的内存。  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/mman.h&amp;gt;
+  void* mmap(void* start, size_t length, int prot, int flags, int fd, off_t offset);
+  int munmap(void* start, size_t length);
+  /* start参数用于指定某个特定的地址作为这段内存的起始地址，若设为NULL，则系统自动分配一个地址。length指定内存段长度。prot设置内存段访问权限。flag控制内存段内容被修改后程序的行为。 */
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;splice函数&lt;br /&gt;
+  在两个文件描述符之间移动数据，零拷贝。  &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;fcntl.h&amp;gt;
+  ssize_t splice(int fd_in, loff_t* off_in, int fd_out, loff_t* off_out, size_t len, unsigned int flags);
+  /* fd_in是待输入数据的文件描述符，若为管道文件描述符，则off_in必须为NULL，fd_in不是管道描述符，则off_in必须表示从输入数据流何处开始读取数据，len指定移动数据的长度。flags参数控制数据如何移动。fd_in和fd_out必须至少有一个是管道文件描述符。 */ 
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;tee函数&lt;br /&gt;
+  在两个管道文件描述符之间复制数据。零拷贝。不消耗数据，源文件描述符上的数据仍然可以用于后续的读操作。 &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;fcnl.h&amp;gt;
+  ssize_t tee( int fd_in, int fd_out, size_t len, unsigned int flags );  
+  /* 参数含义与splice相同，但fd_in,fd_out都必须为管道文件描述符。成功时返回两个文件描述符之间复制的数据数量（字节数）。*/  
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;fcntl函数&lt;br /&gt;
+  file control。提供对文件描述符的各种控制操作。 &lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;fcntl.h&amp;gt;
+  int fcntl(int fd, int cmd, ...);
+  /* fd参数是被操作的文件描述符，cmd参数指定执行何种类型的操作。根据操作类型的不同，该函数可能还需要第三个可选参数arg。*/
+&lt;/code&gt;&lt;/pre&gt;
+
+    &lt;hr /&gt;
+
+    &lt;pre&gt;&lt;code&gt;  //将文件描述符设为非阻塞
+  int setnonblocking( int fd ) {
+  	int old_option = fcntl( fd, F_GETFL);
+  	int new_option = old_option | O_NONBLOCK;
+  	fcntl( fd, F_SETFL, new_option);
+  	return old_option;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Thu, 25 Dec 2014 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2014/12/25/LearnLinux05.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2014/12/25/LearnLinux05.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>git使用心得（1）</title>
@@ -647,76 +826,6 @@
         <pubDate>Sun, 30 Nov 2014 00:00:00 +0800</pubDate>
         <link>http://yourdomain.com/2014/11/30/LearnLinux2.html</link>
         <guid isPermaLink="true">http://yourdomain.com/2014/11/30/LearnLinux2.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Linux高性能服务器编程-读书笔记-CH2</title>
-        <description>&lt;h1 id=&quot;linux&quot;&gt;Linux高性能服务器编程&lt;/h1&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;Edit by Elaine @2014.11.28     &lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&quot;ip&quot;&gt;第二章 IP协议详解&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;IP服务的特点 &lt;br /&gt;
-  &lt;strong&gt;无状态&lt;/strong&gt;（通信双方不同步传输数据的状态信息）可能是乱序、重复的数据     &lt;br /&gt;
-      优点：简单高效
-  &lt;strong&gt;无连接&lt;/strong&gt;（通信双方不长久维持对方的任何信息）每次发送都必须指明IP  &lt;br /&gt;
-  &lt;strong&gt;不可靠&lt;/strong&gt;（不能保证IP数据报准确的到达接收端）上层需要自己实现数据确认，超时重传等      &lt;/li&gt;
-  &lt;li&gt;IP转发&lt;br /&gt;
-    &lt;ul&gt;
-      &lt;li&gt;检查数据报头部TTL值，若为0，丢弃数据报；&lt;/li&gt;
-      &lt;li&gt;查看路由选择新安乡，若设置了该选项，则检查数据报的目标IP地址是否为本机的某个IP地址，若不是，则发送ICMP源站选路失败报文给发送端；  &lt;/li&gt;
-      &lt;li&gt;若有必要，则发源端一个ICMP重定向报文，告诉它一个更合理的下一跳路由器；   &lt;/li&gt;
-      &lt;li&gt;TTL值-1；  &lt;/li&gt;
-      &lt;li&gt;处理IP头部选项；   &lt;/li&gt;
-      &lt;li&gt;若有必要，执行IP分片操作；   &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;
-IPV6并不是IPV4的简单扩展，而是完全不同的协议， 除了解决IP不够用的问题，还增加了多播和流的功能，引入了自动配置功能，增加专门的网络安全功能等。   
-&lt;/code&gt;&lt;/p&gt;
-</description>
-        <pubDate>Fri, 28 Nov 2014 00:00:00 +0800</pubDate>
-        <link>http://yourdomain.com/2014/11/28/LearnLinux1.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/2014/11/28/LearnLinux1.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>黑客与画家-读书笔记</title>
-        <description>&lt;h1 id=&quot;paul-graham&quot;&gt;黑客与画家 · Paul Graham&lt;/h1&gt;
-&lt;blockquote&gt;
-  &lt;blockquote&gt;
-    &lt;p&gt;edit by Elaine -2014-11-09    &lt;/p&gt;
-  &lt;/blockquote&gt;
-&lt;/blockquote&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;程序是写给人看的，附带能在机器上运行。  &lt;/li&gt;
-  &lt;li&gt;触怒他人的言论是那些可能会有人相信的言论。  最令人暴跳如雷的言论，就是被认为说出了真相的言论。    &lt;/li&gt;
-  &lt;li&gt;自由思考比畅所欲言更重要。    &lt;/li&gt;
-  &lt;li&gt;如果自己就是潮水的一部分，怎么能看见潮流的方向呢？你只能永远保持质疑。  &lt;/li&gt;
-  &lt;li&gt;安全问题的关键在于不要有漏洞，而不是任何设计上的决策。  &lt;/li&gt;
-  &lt;li&gt;财富才是你的目标，金钱不是。  金钱是财富的一种简便的表达方式。  &lt;/li&gt;
-  &lt;li&gt;好设计是简单的设计。当你被迫把东西做得很简单时，你就被迫直接面对真正的问题。&lt;/li&gt;
-  &lt;li&gt;软件的难题通常可以被改成等价的较易解决的形式。&lt;/li&gt;
-  &lt;li&gt;并非所有的艰苦都是值得的。世界上有有益的痛苦，也有无益的痛苦。你需要的是咬牙向前冲刺的痛苦，而不是脚被钉子扎破的痛苦。&lt;/li&gt;
-  &lt;li&gt;在大多数领域，看上去容易的事情，背后都需要大量的练习。练习的作用也许是训练你把刻意为之的事情变成一种自觉的行为。&lt;/li&gt;
-  &lt;li&gt;我想，最伟大的大师最终会达到一种超脱自我的境界。他们一心想找到正确答案，如果别人已经回答出了一部分，那就没理由不拿来用。他们足够自信地使用他人的成果，完全不担心因此丧失个人的特点。&lt;/li&gt;
-  &lt;li&gt;推动人才成批涌现的最大因素就是，让有天赋的人聚在一起，共同解决某个难题。在历史的任何时刻都有一些热点项目，一些团体在这些项目上做出伟大的成绩。如果你远离这些中心，几乎不可能单靠自己就取得伟大成果。&lt;/li&gt;
-  &lt;li&gt;单单是无法容忍丑陋的东西还不够，只有对这个领域非常熟悉，你才可能发现哪些地方可以动手改进。你必须锻炼自己。只有在成为某个领域的专家之后，你才会听到心里有一个细微的声音说：“这样解决太糟糕了！一定有更好的选择。”不要忽视这种声音，要培育它们。优秀作品的秘诀就是：非常严格的品味，再加上实现这种品味的能力。  &lt;/li&gt;
-&lt;/ul&gt;
-
-</description>
-        <pubDate>Thu, 27 Nov 2014 00:00:00 +0800</pubDate>
-        <link>http://yourdomain.com/2014/11/27/Hacker.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/2014/11/27/Hacker.html</guid>
         
         
       </item>

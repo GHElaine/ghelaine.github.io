@@ -1,0 +1,254 @@
+<link href="/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all"></link>
+<!DOCTYPE html>
+ 
+<html>
+<head>
+ 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Linux高性能服务器编程-读书笔记-CH6</title>
+</head>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width initial-scale=1">
+
+  <title>Linux高性能服务器编程-读书笔记-CH6</title>
+  <meta name="description" content="Linux高性能服务器编程  Edit by Elaine @2014.12.25第六章 高级I/O函数  CGI服务器工作原理：关闭标准输出文件描述符STDOUT_FILENO，复制socket文件描述符connfd，dup总是返回系统中最小的可用文件描述符，实际返回1。服务器输出到标准输出的内容会直接发送到与...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/2014/12/25/LearnLinux05.html">
+  <link rel="alternate" type="application/atom+xml" title="Elaine's Blog" href="http://yourdomain.com/feed.xml" />
+  
+  <style id="fit-vids-style">
+  .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
+  </style>
+</head>
+
+
+  <body>
+
+    <header class="site-header" >
+  <div class="wrapper">
+    <div class="description">
+      <div>Leave something behind</div>
+      <div>keep moving forward</div>
+    </div>
+    <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+          <a class="page-link" href="/index.html">Elaine's blog</a>
+          
+        
+          
+        
+    </div>
+        
+  </div>
+
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <h1 id="linux">Linux高性能服务器编程</h1>
+<blockquote>
+  <p>Edit by Elaine @2014.12.25</p>
+</blockquote>
+
+<h3 id="io">第六章 高级I/O函数</h3>
+<ul>
+  <li>CGI服务器工作原理：关闭标准输出文件描述符STDOUT_FILENO，复制socket文件描述符connfd，dup总是返回系统中最小的可用文件描述符，实际返回1。服务器输出到标准输出的内容会直接发送到与客户连接对应的socket上，因此printf调用的输出将被客户端获得，而不是显示在服务器程序的终端上。 </li>
+  <li>
+    <p>pipe函数<br />
+  创建一个管道，实现进程间通信。  </p>
+
+    <pre><code>    #include &lt;unistd.h&gt;
+    int pipe( int fd[2] )
+    /* fd[0]和fd[1]分别是管道的两端。fd[0]只能用于读数据，fd[1]只能用于写数据。默认这一对文件描述符是阻塞的。*/   
+</code></pre>
+
+    <p>创建双向管道。</p>
+
+    <pre><code>    #include &lt;sys/types.h&gt;
+    #include &lt;sys/socket.h&gt;
+    int socketpair(int domain, int type, int protocol, int fd[2]);   
+    /* domain只能用UNIX本地协议族AF_UNIX */
+</code></pre>
+  </li>
+  <li>
+    <p>dup函数和dup2函数 <br />
+  标准输入输出重定向。  </p>
+
+    <pre><code>   #include &lt;unistd.h&gt;
+   int dup( int file_descriptor );
+   int dup2( int file_descriptor_one, int file_descriptor_two );  
+   /* dup创建一个新的文件描述符，该新文件描述符和原文件描述符file_descriptor指向相同的文件、管道或者网络连接，且返回的文件描述符总是取系统当前可用的最小整数值 */
+</code></pre>
+  </li>
+  <li>
+    <p>readv和writev函数 <br />
+  readv将数据从文件描述符读到分散的内存块中。writev将分散的内存数据写入文件描述符。  </p>
+
+    <pre><code>   #include &lt;sys/uio.h&gt;
+   ssize_t readv(int fd, const struct iovec* vector, int count);
+   ssize_t writev(int fd, const struct iovec* vector, int count);
+   /* fd是被操作的文件描述符，iovec* 指定一块内存区域。count是数组长度。*/
+</code></pre>
+  </li>
+  <li>
+    <p>sendfile函数 <br />
+  在两个文件描述符之间直接传递数据。直接在内核中操作，避免了内核缓冲区和用户缓冲区之间的数据拷贝。  </p>
+
+    <pre><code>   #include &lt;sys/sendfile.h&gt;
+   ssize_t sendfile(int out_fd, int in_fd, off_t* offset, size_t count);  
+   /* in_fd是待读取内容的文件描述符，必须支持mmap函数，不能是socket管道，out_fd是待写入文件描述符，必须是socket管道，offset指定读入文件流的位置，若为空则从起始位置读，count指定传输的字节数。*/  
+</code></pre>
+  </li>
+  <li>
+    <p>mmap和munmap函数<br />
+  mmap申请一段内存，将这段内存作为进程间通信的共享内存，也可以直接将文件映射到其中。 munmap负责释放由mmap申请的内存。  </p>
+
+    <pre><code>  #include &lt;sys/mman.h&gt;
+  void* mmap(void* start, size_t length, int prot, int flags, int fd, off_t offset);
+  int munmap(void* start, size_t length);
+  /* start参数用于指定某个特定的地址作为这段内存的起始地址，若设为NULL，则系统自动分配一个地址。length指定内存段长度。prot设置内存段访问权限。flag控制内存段内容被修改后程序的行为。 */
+</code></pre>
+  </li>
+  <li>
+    <p>splice函数<br />
+  在两个文件描述符之间移动数据，零拷贝。  </p>
+
+    <pre><code>  #include &lt;fcntl.h&gt;
+  ssize_t splice(int fd_in, loff_t* off_in, int fd_out, loff_t* off_out, size_t len, unsigned int flags);
+  /* fd_in是待输入数据的文件描述符，若为管道文件描述符，则off_in必须为NULL，fd_in不是管道描述符，则off_in必须表示从输入数据流何处开始读取数据，len指定移动数据的长度。flags参数控制数据如何移动。fd_in和fd_out必须至少有一个是管道文件描述符。 */ 
+</code></pre>
+  </li>
+  <li>
+    <p>tee函数<br />
+  在两个管道文件描述符之间复制数据。零拷贝。不消耗数据，源文件描述符上的数据仍然可以用于后续的读操作。 </p>
+
+    <pre><code>  #include &lt;fcnl.h&gt;
+  ssize_t tee( int fd_in, int fd_out, size_t len, unsigned int flags );  
+  /* 参数含义与splice相同，但fd_in,fd_out都必须为管道文件描述符。成功时返回两个文件描述符之间复制的数据数量（字节数）。*/  
+</code></pre>
+  </li>
+  <li>
+    <p>fcntl函数<br />
+  file control。提供对文件描述符的各种控制操作。 </p>
+
+    <pre><code>  #include &lt;fcntl.h&gt;
+  int fcntl(int fd, int cmd, ...);
+  /* fd参数是被操作的文件描述符，cmd参数指定执行何种类型的操作。根据操作类型的不同，该函数可能还需要第三个可选参数arg。*/
+</code></pre>
+
+    <hr />
+
+    <pre><code>  //将文件描述符设为非阻塞
+  int setnonblocking( int fd ) {
+  	int old_option = fcntl( fd, F_GETFL);
+  	int new_option = old_option | O_NONBLOCK;
+  	fcntl( fd, F_SETFL, new_option);
+  	return old_option;
+  }
+</code></pre>
+  </li>
+</ul>
+
+        <!-- 多说评论框 start -->
+        <div class="ds-thread" data-thread-key="Linux高性能服务器编程-读书笔记-CH6" data-title="Linux高性能服务器编程-读书笔记-CH6" data-url="/2014/12/25/LearnLinux05.html"></div>
+        <!-- 多说评论框 end -->
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+          <li><a href="/">Elaine's Blog</a></li>
+          <li><a href="mailto:gaohuielaine@gmail.com">gaohuielaine@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col  footer-col-2"></div>
+      <div class="footer-col  footer-col-3">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/GHElaine">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">GHElaine</span>
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/G.Elaine">
+              <span class="icon  icon--twitter">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809
+                  c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+                </svg>
+              </span>
+
+              <span class="username">G.Elaine</span>
+            </a>
+          </li>
+          
+        </ul>
+        
+      </div>
+    </div>
+   
+      <div class="footer-col-wrapper">
+        <p class="motto">Leave something behind, keep moving forward.
+</p>
+        <p class="copyright">Copyright@2014-Elaine</p>
+      </div>
+  <!-- </div> -->
+
+</footer>
+
+
+  </body>
+
+</html>
+<script type="text/javascript" src="/google-code-prettify/prettify.js"></script>
+<script type="text/javascript" src="/js/jquery.1.8.0.js"></script>
+
+<script type="text/javascript">
+$(function() {
+  $("pre").addClass("prettyprint");
+  prettyPrint();
+});
+</script> 
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"ghelaine"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+

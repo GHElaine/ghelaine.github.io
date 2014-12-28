@@ -1,8 +1,11 @@
+<link href="/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all"></link>
 <!DOCTYPE html>
+ 
 <html>
 <head>
+ 
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Elaine's blog</title>
+  <title>Linux高性能服务器编程-读书笔记-CH7</title>
 </head>
 
   <head>
@@ -10,12 +13,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width initial-scale=1">
 
-  <title>Elaine's blog</title>
-  <meta name="description" content="Leave something behind, keep moving forward.
-">
+  <title>Linux高性能服务器编程-读书笔记-CH7</title>
+  <meta name="description" content="Linux高性能服务器编程  Edit by Elaine @2014.12.28第七章 Linux服务器程序规范">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/">
+  <link rel="canonical" href="http://yourdomain.com/2014/12/28/LearnLinux6.html">
   <link rel="alternate" type="application/atom+xml" title="Elaine's Blog" href="http://yourdomain.com/feed.xml" />
   
   <style id="fit-vids-style">
@@ -56,113 +58,66 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <!DOCTYPE html>
-<html>
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Elaine's Blog</title>
-</head>
+        <h1 id="linux">Linux高性能服务器编程</h1>
+<blockquote>
+  <p>Edit by Elaine @2014.12.28</p>
+</blockquote>
 
-  <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width initial-scale=1">
+<h3 id="linux-1">第七章 Linux服务器程序规范</h3>
 
-  <title>Elaine's Blog</title>
-  <meta name="description" content="Leave something behind, keep moving forward.
-">
+<p>​* 日志<br />
+    Linux系统提供守护进程syslogd或rsyslogd来处理系统日志。服务器调试和维护都需要日志系统。<br />
+    分别使用syslog、printk函数将用户输出消息和内核消息输出到指定文件，syslogd或rsyslogd函数通过读取指定文件再输出到指定日志文件，来记录系统日志。 </p>
 
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/">
-  <link rel="alternate" type="application/atom+xml" title="Elaine's Blog" href="http://yourdomain.com/feed.xml" />
-</head>
+<ul>
+  <li>
+    <p>syslog函数<br />
+   用于和rsyslogd守护进程通信：</p>
 
+    <p>#include <syslog.h>
+   void syslog( int priority, const char* message, ...);
+   /* 采用可变参数来结构化输出；*/  </syslog.h></p>
+  </li>
+  <li>
+    <p>日志掩码  <br />
+  用于过滤系统调试时的日志。</p>
 
-<body> 
-<div class="page-content">
-<div class="wrapper">
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Ghelaine.GitHub.io by GHElaine</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <p>​#include <syslog.h>
+   ​int setlogmask( int maskpri);  
+   ​/* 日志级别大于maskpri的日志信息将被系统忽略*/   </syslog.h></p>
+  </li>
+</ul>
 
-  </head>
-  <body>
-      <header class="header"> 
-        <h1><strong>Elaine's Blog</strong></h1>
-        <p>Something about technic, more about life</p>
-      </header>
+<p>​
+   * 关闭日志功能 </p>
 
-      <div id="banner">
-        <span id="logo"></span>
+<pre><code>    ​#include &lt;syslog.h&gt; 
+    ​void closelog();
+</code></pre>
 
-        <a href="https://github.com/GHElaine" class="button fork"><strong>Elaine's GitHub</strong></a>
-      </div><!-- end banner -->
-    <header class=“page-content”>
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
-  <section>
-      <p> 最新博文 </p>
-      <ul> 
-        
-           <li>28 Dec 2014 <a href="/2014/12/28/LearnLinux6.html">Linux高性能服务器编程-读书笔记-CH7</a></li>
-        
-           <li>25 Dec 2014 <a href="/2014/12/25/LearnLinux05.html">Linux高性能服务器编程-读书笔记-CH6</a></li>
-        
-           <li>18 Dec 2014 <a href="/2014/12/18/git1.html">git使用心得（1）</a></li>
-        
-           <li>13 Dec 2014 <a href="/2014/12/13/yidijinhuang.html">繁华落尽，一地金黄</a></li>
-        
-           <li>12 Dec 2014 <a href="/2014/12/12/hacker.html">《黑客与画家》 读后感</a></li>
-        
-           <li>09 Dec 2014 <a href="/2014/12/09/SocketPractice1.html">Socket API 编程实践（1）</a></li>
-        
-           <li>06 Dec 2014 <a href="/2014/12/06/LearnLinux4.html">Linux高性能服务器编程-读书笔记-CH5</a></li>
-        
-           <li>02 Dec 2014 <a href="/2014/12/02/LearnLinux3.html">Linux高性能服务器编程-读书笔记-CH4</a></li>
-        
-           <li>01 Dec 2014 <a href="/2014/12/01/LiveAndDeath.html">直面生死</a></li>
-        
-           <li>30 Nov 2014 <a href="/2014/11/30/LearnLinux2.html">Linux高性能服务器编程-读书笔记-CH3</a></li>
-        
-           <li>28 Nov 2014 <a href="/2014/11/28/LearnLinux1.html">Linux高性能服务器编程-读书笔记-CH2</a></li>
-        
-           <li>27 Nov 2014 <a href="/2014/11/27/Hacker.html">黑客与画家-读书笔记</a></li>
-        
-           <li>26 Nov 2014 <a href="/2014/11/26/LearningLinux0.html">Linux高性能服务器编程 读书笔记-CH1</a></li>
-        
-           <li>16 Apr 2014 <a href="/2014/04/16/aboutopencv.html">有关OpenCV那些事</a></li>
-        
-      </ul>
-      </section> 
-    </header>
-      <footer>
-        <!-- <p><small>Hosted on GitHub Pages</small></p> -->
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
-  </body>
-  </html>
-      </div>
-    </div>
+<ul>
+  <li>
+    <p>用户信息</p>
 
-  </body>
+    <pre><code>	​​ #include &lt;sys/types.h&gt;    
+	​​ ​#include &lt;unistd.h&gt;
+	 ​uid_t getuid();         ​    ​    ​/* 获取真实用户ID */
+	 ​​uid_t geteuid();    ​    ​        ​/* 获取有效用户ID */​
+	 ​​gid_t getgid();    ​    ​    ​    ​/* 获取真实组ID */
+	 ​​​git_t getegit();    ​    ​    ​    ​/* 获取有效组ID */
+	 ​​​​int setuid(uid_t uid);    ​    ​   /* 设置真实用户ID */
+	 ​​​​​int seteuid(uid_t uid);    ​    ​  /* 设置有效用户ID */
+	 ​​​​​​int setgid(git_t gid);    ​    ​     /* 设置真实组ID */
+	 ​​​​​​int setegid(git_t gid);    ​    ​    /* 设置有效组ID */
+</code></pre>
+  </li>
+</ul>
 
-</html>
+<p><strong>一个进程拥有两个用户ID： UID和EUID。EUID为了方便资源访问，它可以使得用户拥有该程序的有效用户权限。</strong></p>
 
+        <!-- 多说评论框 start -->
+        <div class="ds-thread" data-thread-key="Linux高性能服务器编程-读书笔记-CH7" data-title="Linux高性能服务器编程-读书笔记-CH7" data-url="/2014/12/28/LearnLinux6.html"></div>
+        <!-- 多说评论框 end -->
       </div>
     </div>
 
@@ -225,3 +180,28 @@
   </body>
 
 </html>
+<script type="text/javascript" src="/google-code-prettify/prettify.js"></script>
+<script type="text/javascript" src="/js/jquery.1.8.0.js"></script>
+
+<script type="text/javascript">
+$(function() {
+  $("pre").addClass("prettyprint");
+  prettyPrint();
+});
+</script> 
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"ghelaine"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
