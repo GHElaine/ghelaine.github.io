@@ -13,31 +13,28 @@ title: Linux高性能服务器编程-读书笔记-CH7
      
    * syslog函数  
    用于和rsyslogd守护进程通信：
-     
-	
-        #include <syslog.h>
-        void syslog( int priority, const char* message, ...);
-        /* 采用可变参数来结构化输出；*/  
+   
+           #include <syslog.h>
+           void syslog( int priority, const char* message, ...);
+           /* 采用可变参数来结构化输出；*/  
   
     
    * 日志掩码    
   用于过滤系统调试时的日志。
   
- 	
-        ​#include <syslog.h>
-        ​int setlogmask( int maskpri);  
-        ​/* 日志级别大于maskpri的日志信息将被系统忽略*/   
-       
-   ​
-   * 关闭日志功能 
+    	​#include <syslog.h>
+    	​​int setlogmask( int maskpri);  
+    	​​​/* 日志级别大于maskpri的日志信息将被系统忽略*/   
+    	​​​
+          ​
+   * 关闭日志功能   
    
    
-        ​#include <syslog.h> 
-        ​void closelog();
-   
+           #include <syslog.h> 
+           void closelog();
+  
    * 用户信息
      
-	
     	​​ #include <sys/types.h>    
     	​​ ​#include <unistd.h>
     	 ​uid_t getuid();         ​    ​    ​/* 获取真实用户ID */

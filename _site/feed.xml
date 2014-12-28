@@ -6,8 +6,8 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 28 Dec 2014 23:59:47 +0800</pubDate>
-    <lastBuildDate>Sun, 28 Dec 2014 23:59:47 +0800</lastBuildDate>
+    <pubDate>Mon, 29 Dec 2014 00:24:06 +0800</pubDate>
+    <lastBuildDate>Mon, 29 Dec 2014 00:24:06 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
     
       <item>
@@ -28,28 +28,29 @@
     &lt;p&gt;syslog函数&lt;br /&gt;
    用于和rsyslogd守护进程通信：&lt;/p&gt;
 
-    &lt;p&gt;#include &lt;syslog.h&gt;
-   void syslog( int priority, const char* message, ...);
-   /* 采用可变参数来结构化输出；*/  &lt;/syslog.h&gt;&lt;/p&gt;
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;syslog.h&amp;gt;
+  void syslog( int priority, const char* message, ...);
+  /* 采用可变参数来结构化输出；*/  
+&lt;/code&gt;&lt;/pre&gt;
   &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;日志掩码  &lt;br /&gt;
   用于过滤系统调试时的日志。&lt;/p&gt;
 
-    &lt;p&gt;​#include &lt;syslog.h&gt;
-   ​int setlogmask( int maskpri);  
-   ​/* 日志级别大于maskpri的日志信息将被系统忽略*/   &lt;/syslog.h&gt;&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;​
-   * 关闭日志功能 &lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;    ​#include &amp;lt;syslog.h&amp;gt; 
-    ​void closelog();
+    &lt;pre&gt;&lt;code&gt;	​#include &amp;lt;syslog.h&amp;gt;
+	​​int setlogmask( int maskpri);  
+	​​​/* 日志级别大于maskpri的日志信息将被系统忽略*/   
+	​​​
+ ​
 &lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;关闭日志功能   &lt;/p&gt;
 
-&lt;ul&gt;
+    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;syslog.h&amp;gt; 
+  void closelog();
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;用户信息&lt;/p&gt;
 

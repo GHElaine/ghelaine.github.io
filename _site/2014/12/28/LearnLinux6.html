@@ -74,28 +74,29 @@
     <p>syslog函数<br />
    用于和rsyslogd守护进程通信：</p>
 
-    <p>#include <syslog.h>
-   void syslog( int priority, const char* message, ...);
-   /* 采用可变参数来结构化输出；*/  </syslog.h></p>
+    <pre><code>  #include &lt;syslog.h&gt;
+  void syslog( int priority, const char* message, ...);
+  /* 采用可变参数来结构化输出；*/  
+</code></pre>
   </li>
   <li>
     <p>日志掩码  <br />
   用于过滤系统调试时的日志。</p>
 
-    <p>​#include <syslog.h>
-   ​int setlogmask( int maskpri);  
-   ​/* 日志级别大于maskpri的日志信息将被系统忽略*/   </syslog.h></p>
-  </li>
-</ul>
-
-<p>​
-   * 关闭日志功能 </p>
-
-<pre><code>    ​#include &lt;syslog.h&gt; 
-    ​void closelog();
+    <pre><code>	​#include &lt;syslog.h&gt;
+	​​int setlogmask( int maskpri);  
+	​​​/* 日志级别大于maskpri的日志信息将被系统忽略*/   
+	​​​
+ ​
 </code></pre>
+  </li>
+  <li>
+    <p>关闭日志功能   </p>
 
-<ul>
+    <pre><code>  #include &lt;syslog.h&gt; 
+  void closelog();
+</code></pre>
+  </li>
   <li>
     <p>用户信息</p>
 
