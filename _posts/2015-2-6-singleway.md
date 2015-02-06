@@ -2,7 +2,6 @@
 layout: default
 title: 一个人的朝圣
 ---
-
 #一个人的朝圣
 >Edit by Elaine @2015.2.6
 
