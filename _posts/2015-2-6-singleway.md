@@ -1,5 +1,5 @@
 ---
-layout:default
+layout: default
 title: 一个人的朝圣
 ---
 
