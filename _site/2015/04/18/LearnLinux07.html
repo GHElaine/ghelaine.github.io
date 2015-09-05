@@ -1,0 +1,242 @@
+<link href="/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all"></link>
+<!DOCTYPE html>
+ 
+<html>
+<head>
+ 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Linux高性能服务器编程-读书笔记-CH8</title>
+</head>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width initial-scale=1">
+
+  <title>Linux高性能服务器编程-读书笔记-CH8</title>
+  <meta name="description" content="Linux高性能服务器编程  Edit by Elaine @2015.4.18第八章 高性能服务器程序框架">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/2015/04/18/LearnLinux07.html">
+  <link rel="alternate" type="application/atom+xml" title="Elaine's Blog" href="http://yourdomain.com/feed.xml" />
+  
+  <style id="fit-vids-style">
+  .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
+  </style>
+</head>
+
+
+  <body>
+
+    <header class="site-header" >
+  <div class="wrapper">
+    <div class="description">
+      <div>Leave something behind</div>
+      <div>keep moving forward</div>
+    </div>
+    <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+          <a class="page-link" href="/index.html">Elaine's blog</a>
+          
+        
+          
+        
+    </div>
+        
+  </div>
+
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <h1 id="linux">Linux高性能服务器编程</h1>
+<blockquote>
+  <p>Edit by Elaine @2015.4.18</p>
+</blockquote>
+
+<h3 id="section">第八章 高性能服务器程序框架</h3>
+
+<p>服务器程序的三个主要模块    </p>
+
+<ul>
+  <li>I/O处理单元    </li>
+  <li>逻辑单元   </li>
+  <li>存储单元   </li>
+</ul>
+
+<p><strong>服务器模型</strong>    </p>
+
+<ul>
+  <li>
+    <p><strong><em>C/S模型</em></strong> <br />
+  客户端/服务器模型
+  服务器启动后，创建一个或多个监听socket，调用bind函数绑定服务器端口，调用listen函数等待客户连接。服务器稳定运行后，客户端调用connect函数向服务器发起连接。客户端的异步请求需要服务器使用某种I/O模型来监听。<br />
+  C/S模型适合资源相对集中的场合，实现简单，但访问量过大时，所有客户得到的响应都较慢。  </p>
+  </li>
+  <li>
+    <p><strong><em>P2P模型</em></strong><br />
+  点对点模型，网络上所有主机地位平等。<br />
+  云计算机群可看做p2p模型的一个典范。当用户之间传输请求过多时，网络负载将加重。<br />
+  P2P模型往往有一个专门的发现服务器，能够提供查找服务，使得每个客户都尽快找到自己需要的资源。    </p>
+  </li>
+</ul>
+
+<p><strong>服务器编程框架</strong>    </p>
+
+<ul>
+  <li>I/O处理单元：服务器管理客户连接的模块。<br />
+  主要工作：等待并接受新的客户连接，接收客户数据，将服务器数据返回给客户端（数据收发也可能在逻辑单元执行）。服务器机群的I/O处理单元一般都实现了负载均衡。  </li>
+  <li>逻辑单元：一个进程或线程。<br />
+  主要工作：分析并处理客户数据，然后将结果传递给I/O处理单元，或直接发送给客户端。服务器机群中一个逻辑单元本身就是一台逻辑服务器。    </li>
+  <li>网络存储单元：数据库、缓存和文件，甚至是独立服务器，但不是必须的。   </li>
+  <li>请求队列：各个单元之间的通信方式的抽象。服务器机群的请求队列是各台服务器之间预先建立的、静态的、永久的TCP连接。</li>
+</ul>
+
+<p><strong>I/O模型</strong><br />
+阻塞I/O、I/O复用和信号驱动I/O都是同步I/O模型。I/O的读写操作都是在I/O事件发生之后，由应用程序完成的。对异步I/O而言，用户可以直接对I/O执行读写操作，这些操作告诉内核用户读写缓冲区的位置，以及I/O操作完成后内核通知应用程序的方式。异步I/O的读写操作总是立即返回，不论是否阻塞，真正的读写由内核接管。  </p>
+
+<p><strong>两种高效的事件处理模式</strong>  </p>
+
+<ul>
+  <li>Reactor  同步I/O <br />
+  主线程只监听是否有事件发生，有则通知工作线程，读写数据、接受新连接、处理请求均在工作线程完成。<br />
+    <ol>
+      <li>主线程在epoll内核事件表注册socket上的读就绪事件。  </li>
+      <li>主线程调用epoll_wait等待socket上的数据可读。  </li>
+      <li>当socket上有数据可读时，epoll_wait通知主线程。主线程将socket可读事件放入请求队列。  </li>
+      <li>睡眠在请求队列的某个工作线程被唤醒，它从socket读取数据，处理客户请求，然后往epoll内核注册该socket上的写就绪事件。  </li>
+      <li>主线程调用epoll_wait等待socket可写。  </li>
+      <li>socket可写时，epoll_wait通知主线程。主线程将socket可写事件放入请求队列。  </li>
+      <li>睡眠在请求队列上的某个工作线程被唤醒，往socket上写入服务器处理客户请求的结果。  </li>
+    </ol>
+  </li>
+  <li>Proactor 异步I/O  <br />
+  将所有I/O操作都交给主线程和内核来处理，工作线程仅负责业务逻辑。<br />
+    <ol>
+      <li>主线程调用aio_read向内核注册socket上的读完成时间，并告诉内核用户缓冲区的位置，以及读操作完成时如何通知该应用程序。  </li>
+      <li>主线程继续处理其他逻辑。  </li>
+      <li>当socket上的数据被读入用户缓冲区后，内核向应用程序发送一个信号，以通知应用程序数据已经可用。  </li>
+      <li>应用程序预先定义好的信号处理函数选择一个工作线程来处理客户请求，工作线程处理完客户请求之后，调用aio_write函数向内核注册socket上的写完成事件，并告诉内核用户写缓冲区的位置，以及写操作完成时如何通知应用程序。  </li>
+      <li>主线程继续处理其他逻辑。  </li>
+      <li>当用户缓冲区的数据被写入socket后，内核向应用程序发送一个信号，通知应用程序数据已经发送完毕。</li>
+      <li>应用程序预先定义好的信号处理函数选择一个工作线程来做善后处理，比如决定是否关闭socket。  </li>
+    </ol>
+  </li>
+</ul>
+
+<p><strong>高效并发模式</strong>   </p>
+
+<p>计算密集型程序不适合并发，任务切换导致效率更低。    </p>
+
+<ul>
+  <li>
+    <p>半同步/半异步模式<br />
+  这里的“同步”：完全按照程序代码顺序执行；“异步”：程序执行需要系统事件驱动。<br />
+  同步线程用于处理客户逻辑，异步线程用于处理I/O事件。    </p>
+  </li>
+  <li>
+    <p>领导者/追随者模式<br />
+  多个工作线程轮流获得事件源集合，轮流监听、分发处理事件的一种模式。任意时间点只有一个领导者线程，负责监听I/O事件，其他线程都是追随者。   </p>
+  </li>
+</ul>
+
+
+        <!-- 多说评论框 start -->
+        <div class="ds-thread" data-thread-key="Linux高性能服务器编程-读书笔记-CH8" data-title="Linux高性能服务器编程-读书笔记-CH8" data-url="/2015/04/18/LearnLinux07.html"></div>
+        <!-- 多说评论框 end -->
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+          <li><a href="/">Elaine's Blog</a></li>
+          <li><a href="mailto:gaohuielaine@gmail.com">gaohuielaine@gmail.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col  footer-col-2"></div>
+      <div class="footer-col  footer-col-3">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/GHElaine">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">GHElaine</span>
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/G.Elaine">
+              <span class="icon  icon--twitter">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809
+                  c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+                </svg>
+              </span>
+
+              <span class="username">G.Elaine</span>
+            </a>
+          </li>
+          
+        </ul>
+        
+      </div>
+    </div>
+   
+      <div class="footer-col-wrapper">
+        <p class="motto">Leave something behind, keep moving forward.
+</p>
+        <p class="copyright">Copyright@2014-Elaine</p>
+      </div>
+  <!-- </div> -->
+
+</footer>
+
+
+  </body>
+
+</html>
+<script type="text/javascript" src="/google-code-prettify/prettify.js"></script>
+<script type="text/javascript" src="/js/jquery.1.8.0.js"></script>
+
+<script type="text/javascript">
+$(function() {
+  $("pre").addClass("prettyprint");
+  prettyPrint();
+});
+</script> 
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"ghelaine"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+

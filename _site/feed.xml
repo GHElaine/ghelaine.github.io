@@ -6,9 +6,705 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 29 Dec 2014 00:24:06 +0800</pubDate>
-    <lastBuildDate>Mon, 29 Dec 2014 00:24:06 +0800</lastBuildDate>
+    <pubDate>Sat, 05 Sep 2015 22:55:00 +0800</pubDate>
+    <lastBuildDate>Sat, 05 Sep 2015 22:55:00 +0800</lastBuildDate>
     <generator>Jekyll v2.5.2</generator>
+    
+      <item>
+        <title>序列化的秘密-读书笔记（1）</title>
+        <description>&lt;h1 id=&quot;section&quot;&gt;序列化的秘密–读书笔记（1）&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Yuanqi
+2015-09-05  &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;为什么要有序列化&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;序列化解决的问题&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;内存被回收后，内存中的对象没法用了  &lt;/li&gt;
+  &lt;li&gt;网络上传输的对象，而网络两端不是不共享内存的  &lt;/li&gt;
+  &lt;li&gt;远程接口调用，两端各自再虚拟机中运行，内存不共享，参数怎么传，结果怎么返   &lt;/li&gt;
+  &lt;li&gt;。。。。。。  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;section-3&quot;&gt;序列化就是把这些对象转化成一段字节序列，放在流中，可存储于文件或在网络传输，需要用到时读取这个字节序列，重建对象&lt;/h4&gt;
+
+&lt;h2 id=&quot;section-4&quot;&gt;序列化可能引起的问题&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;序列化的实例创建不受限制   &lt;/li&gt;
+  &lt;li&gt;序列化的实例可能无法符合类之前的一些要求 ，因为不调用类的构造器   &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-5&quot;&gt;一个类，哪些东西需要序列化&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;静态成员是类属性，不是对象属性，&lt;strong&gt;&lt;em&gt;不需要&lt;/em&gt;&lt;/strong&gt;实例化    &lt;/li&gt;
+  &lt;li&gt;普通成员变量&lt;strong&gt;&lt;em&gt;需要&lt;/em&gt;&lt;/strong&gt;实例化&lt;/li&gt;
+  &lt;li&gt;成员方法是类的无状态指令，&lt;strong&gt;&lt;em&gt;不需要&lt;/em&gt;&lt;/strong&gt;序列化   &lt;/li&gt;
+  &lt;li&gt;成员是引用变量，需要序列化，保证变量的信息完整  &lt;/li&gt;
+  &lt;li&gt;继承自序列化过的父类：父类会被序列化，子类不显式表明实现序列化接口也依然可以被序列化，反序列化时不会调用父类的构造方法   &lt;/li&gt;
+  &lt;li&gt;继承自未实现序列化的父类： 
+    1. 父类有无参构造方法，子类可序列化，且反序列化时调用父类无参构造方法，但父类不可序列化； &lt;br /&gt;
+    2. 父类没有无参构造方法，子类反序列化时会抛异常，因为调不到父类的构造方法，无法完整还原对象信息      &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-6&quot;&gt;需要被保护的信息&lt;/h3&gt;
+&lt;p&gt;使用transient关键词修饰。&lt;br /&gt;
+由transient修饰的变量，不会被序列化。  &lt;/p&gt;
+
+&lt;h3 id=&quot;section-7&quot;&gt;序列化算法&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;文件头，表明协议和版本号，类似名片的作用。  &lt;/li&gt;
+  &lt;li&gt;对象信息。类名，有哪些属性。  &lt;/li&gt;
+  &lt;li&gt;当前对象属性信息，什么类型，什么名字。  &lt;/li&gt;
+  &lt;li&gt;当前类的父类信息，类名、属性。   &lt;/li&gt;
+  &lt;li&gt;父类的属性值。&lt;/li&gt;
+  &lt;li&gt;当前对象的属性值。  &lt;/li&gt;
+  &lt;li&gt;当前对象的引用类信息，属性信息，包括其父类。循环2-5的过程。&lt;/li&gt;
+  &lt;li&gt;当前对象的引用类属性值。 &lt;br /&gt;
+栈式存储。反序列化时，先实例化父类，再实例化子类，因此父类信息在栈顶。   &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;section-8&quot;&gt;定制个性化序列化算法&lt;/h2&gt;
+
+&lt;h4 id=&quot;section-9&quot;&gt;默认序列化算法不适用的场景：&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;安全性高 构造放阿飞的约束严格的场景  &lt;/li&gt;
+  &lt;li&gt;类很大，但只想保存一部分信息   不想用transient一个一个标记  &lt;/li&gt;
+  &lt;li&gt;希望序列化后的文件易读易懂   &lt;/li&gt;
+  &lt;li&gt;逻辑结构（以对象维根的结构）和物理结构（对象序列化后的结构）相差太远     &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;section-10&quot;&gt;定制序列化算法的方式：&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;实现了Serializable的类，覆写writeObject()和readObject()  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;```     &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; import java.io.*;   
+ /**   
+  * Created by elaine on 9/5/15.   
+  */    
+public class StringList implements Serializable {   
+    private static final Long serialVersionUID = 1L;   
+            
+transient private int size = 0;
+transient private Entry head = null;
+
+private static class Entry implements Serializable {
+    private static final long serialVersionUID = 1L;
+    String data;
+    Entry next;
+    Entry pre;
+}
+
+public StringList(String headString) {
+    initHead(headString);
+}
+
+private void initHead(String headString) {
+    this.head = new Entry();
+    this.head.data = headString;
+    this.head.next = this.head;
+    this.head.pre = this.head;
+    this.size = 1;
+}
+
+public StringList add(String str) {
+    Entry newEntry = new Entry();
+    newEntry.data = str;
+    newEntry.pre = this.head.pre;
+    this.head.pre.next = newEntry;
+    this.head.pre = newEntry;
+    newEntry.next = this.head;
+
+    this.size ++;
+    return this;
+}
+
+public String toString() {
+    Entry e = head;
+    StringBuilder sb = new StringBuilder(e.data);
+    while (hasNext(e)) {
+        e = e.next;
+        sb.append(&quot;-&amp;gt;&quot; + e.data);
+    }
+    return sb.toString();
+}
+
+private boolean hasNext(Entry e) {
+    return e.next != this.head;
+}
+
+private void writeObject(ObjectOutputStream s) throws IOException {
+    s.defaultWriteObject();
+    s.writeInt(size);
+
+    // 写入头数据
+    Entry e = head;
+    s.writeUTF(e.data);
+
+    // 按顺序写入其他字符串
+    while(hasNext(e)) {
+        e = e.next;
+        s.writeUTF(e.data);
+    }
+}
+
+private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+    s.defaultReadObject();
+    int size = s.readInt();
+
+    String headStr = s.readUTF();
+    initHead(headStr);
+
+    for (int i = 1; i &amp;lt; size; i++) {
+        String str = s.readUTF();
+        add(str);
+    }
+}
+public static void main(String[] arg) throws IOException, ClassNotFoundException{
+    StringList sl = new StringList(&quot;yuanqi&quot;);
+    sl.add(&quot;is&quot;).add(&quot;Elaine&quot;);
+    System.out.println(sl);
+    SerialUtils.writeObject(sl, &quot;sl.byte&quot;);
+    SerialUtils.readObject(&quot;sl.byte&quot;);
+} }    ```
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;实现Externalizable接口   &lt;br /&gt;
+   Externalizable接口继承自Serializable，区别如下：&lt;br /&gt;
+    *    Externalizable里的writeExternal 、readExternal两个方法必须实现  &lt;br /&gt;
+    *    Serializable在反序列化时，生成实例依靠语言外的隐藏构造方法，底层靠虚拟机实现，但Externalizable不依赖于虚拟机提供的任何帮助，要求类显式的提供无参构造方法，否则不能序列化    &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;```&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;import java.io.*;
+
+/**
+ * Created by elaine on 9/5/15.
+ */
+ public class StringList implements Externalizable {
+    private static final Long serialVersionUID = 1L;
+
+    transient private int size = 0;
+    transient private Entry head = null;
+
+private static class Entry implements Serializable {
+    private static final long serialVersionUID = 1L;
+    String data;
+    Entry next;
+    Entry pre;
+}
+
+public StringList(String headString) {
+    initHead(headString);
+}
+
+private void initHead(String headString) {
+    this.head = new Entry();
+    this.head.data = headString;
+    this.head.next = this.head;
+    this.head.pre = this.head;
+    this.size = 1;
+}
+
+public StringList add(String str) {
+    Entry newEntry = new Entry();
+    newEntry.data = str;
+    newEntry.pre = this.head.pre;
+    this.head.pre.next = newEntry;
+    this.head.pre = newEntry;
+    newEntry.next = this.head;
+
+    this.size ++;
+    return this;
+}
+
+public String toString() {
+    Entry e = head;
+    StringBuilder sb = new StringBuilder(e.data);
+    while (hasNext(e)) {
+        e = e.next;
+        sb.append(&quot;-&amp;gt;&quot; + e.data);
+    }
+    return sb.toString();
+}
+
+private boolean hasNext(Entry e) {
+    return e.next != this.head;
+}
+
+@Override
+public void writeExternal(ObjectOutput out) throws IOException {
+    out.writeInt(size);
+    Entry e = head;
+    out.writeUTF(e.data);
+    
+    while(hasNext(e)) {
+        e = e.next;
+        out.writeUTF(e.data);
+    }
+}
+
+@Override
+public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    int size = in.readInt();
+    String headStr = in.readUTF();
+    initHead(headStr);
+    for (int i = 1; i &amp;lt; size; i++) {
+        String str = in.readUTF();
+        add(str);
+    }
+}
+
+//无参构造方法
+public StringList() {
+    System.out.println(&quot;无参构造方法&quot;);
+    initHead(&quot;&quot;);
+}
+
+public static void main(String[] arg) throws IOException, ClassNotFoundException{
+    StringList sl = new StringList(&quot;yuanqi&quot;);
+    sl.add(&quot;is&quot;).add(&quot;Elaine&quot;);
+    System.out.println(sl);
+    SerialUtils.writeObject(sl, &quot;sl.byte&quot;);
+    SerialUtils.readObject(&quot;sl.byte&quot;);
+}    }   ```
+&lt;/code&gt;&lt;/pre&gt;
+
+</description>
+        <pubDate>Sat, 05 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2015/09/05/Secret%20of%20Serialize.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2015/09/05/Secret%20of%20Serialize.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>深入理解计算机系统——读书笔记</title>
+        <description>&lt;h1 id=&quot;section&quot;&gt;深入理解计算机系统–读书笔记&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Elaine 2014-09-14&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;ch1&quot;&gt;CH1&lt;/h2&gt;
+
+&lt;p&gt;1.2   hello.c程序的执行过程：&lt;br /&gt;
+           Hello.c -&amp;gt; 预处理-&amp;gt; hello.i -&amp;gt; 编译器 -&amp;gt; hello.s -&amp;gt; 汇编器 -&amp;gt; hello.o -&amp;gt; 链接器 -&amp;gt; hello (可执行程序)
+        链接是在机器指令生成之前，汇编阶段结束之后开始的。   &lt;/p&gt;
+
+&lt;p&gt;1.7  &lt;strong&gt;&lt;em&gt;操作系统的两个功能：&lt;/em&gt;&lt;/strong&gt;  &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1）防止硬件被失控的应用程序滥用；    &lt;/li&gt;
+  &lt;li&gt;2）在控制复杂而又通常广泛不同的低级硬件设备方面，为应用程序提供简单一致的方法。  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;1.7.1 &lt;strong&gt;&lt;em&gt;进程:&lt;/em&gt;&lt;/strong&gt;操作系统对运行程序的一种抽象。    &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;并发：一个系统上同时可以运行多个程序；    &lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;上下文切换：实现不同进程指令交替执行；  &lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;上下文：操作系统保存的进程运行时所需的状态信息；  &lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;1.7.2 &lt;strong&gt;&lt;em&gt;线程：&lt;/em&gt;&lt;/strong&gt; 一个进程可以由多个线程组成。每个线程都运行在进程的上下文中，并共享同样的代码和全局数据。多线程比多进程更容易共享数据，也比进程更高效。  &lt;/p&gt;
+
+&lt;p&gt;1.7.3 &lt;strong&gt;&lt;em&gt;虚拟存储器：&lt;/em&gt;&lt;/strong&gt; 每个进程看到的存储器都是一致的，称为虚拟地址空间。&lt;br /&gt;
+从下到上，依次：&lt;strong&gt;程序代码和数据区&lt;/strong&gt;（可执行文件直接初始化）；&lt;strong&gt;堆&lt;/strong&gt;（Malloc，free等操作运行时加载）；&lt;strong&gt;共享区&lt;/strong&gt;（C标准库以及数学库加载需要）；&lt;strong&gt;栈&lt;/strong&gt;（运行时加载，动态增长和缩减）；&lt;strong&gt;内核虚拟存储器&lt;/strong&gt;（地址空间顶部四分之一留给内核常驻，程序不允许读取这部分内容）&lt;/p&gt;
+
+&lt;h2 id=&quot;ch2&quot;&gt;CH2&lt;/h2&gt;
+&lt;p&gt;2.1.2 字长决定虚拟地址空间的大小。  &lt;/p&gt;
+
+&lt;h2 id=&quot;ch3&quot;&gt;CH3&lt;/h2&gt;
+&lt;p&gt;3.1 &lt;strong&gt;&lt;em&gt;摩尔定律&lt;/em&gt;&lt;/strong&gt;：每过18个月，芯片上集成的晶体管的数量翻倍。&lt;br /&gt;
+3.6 switch语句是通过跳转表来索引跳转程序段的，这种结构使switch case语句的执行效率远高于if else，并且与case 的数量无关。编译器会在case较多（大于等于4个），且跨度较小时，使用&lt;strong&gt;跳转表&lt;/strong&gt;。&lt;br /&gt;
+    &lt;em&gt;** 栈 **&lt;/em&gt;：向着地址变小的方向增长，从顶向底压栈。&lt;/p&gt;
+
+&lt;h2 id=&quot;ch4&quot;&gt;CH4&lt;/h2&gt;
+&lt;p&gt;程序指令执行的过程：取指，解析，执行，访存，回写  &lt;/p&gt;
+
+&lt;h2 id=&quot;ch5&quot;&gt;CH5&lt;/h2&gt;
+&lt;p&gt;5．1编译器优化的限制：  &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1）不能改变正确的程序行为；    &lt;/li&gt;
+  &lt;li&gt;2）对程序行为和使用环境的了解有限；      &lt;/li&gt;
+  &lt;li&gt;3）需要快速完成编译工作。另外：不可知的函数调用。  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;优化的方面：   &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1） 消除循环的低效率  &lt;/li&gt;
+  &lt;li&gt;2） 减少过程调用    &lt;/li&gt;
+  &lt;li&gt;3） 消除不必要的存储器引用   &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;处理器性能受三类约束限制：  &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1）程序中数据相关性迫使一些操作延迟直到他们的操作数被计算出来。因为功能单元有一个或多个周期的执行时间，这久设置了一个给定的操作序列执行周期数的下限。  &lt;/li&gt;
+  &lt;li&gt;2）资源约束限制了在任意给定时刻能够执行多少个操作。  &lt;/li&gt;
+  &lt;li&gt;3）分支预测逻辑限制处理器能够在指令流中超前工作以保持执行单元繁忙的程度。预测错误时，处理器从正确位置重新开始都会引起很大的延迟。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;ch7-&quot;&gt;CH7 链接&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;链接：将不同部分的代码和数据收集和组合成为一个单一文件的过程这根文件可被加载（或拷贝）到存储器并执行。链接可以执行于编译时，即源代码被翻译成机器代码时，也可以执行于加载时，就是程序被加载器加载到存储器并执行时，甚至执行于运行时，由应用程序来执行。    &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;静态链接&lt;/h2&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;静态链接器：以一组可重定位目标文件和命令行参数作为输入，生成一个完全链接的可以加载和运行的可执行目标文件作为输入。输入的可重定位目标文件由各种不同的代码和数据节组成。指令在一个节中，初始化的全局变量在另一个节中，而未初始化的变量又在另一个节中。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;符号解析：目标文件定义和引用符号。目的是将每个符号引用和一个符号定义联系起来。  &lt;br /&gt;
+&amp;gt; 连接器解析符号引用的方法是将每个引用与它输入的可重定位目标文件的符号表中的一个确定的符号定义联系起来。对那些和引用定义在相同模块中的本地符号引用，符号解析是非常简单明了的。编译器只允许每个模块中的每个本地符号只有一个定义。编译器确保静态本地变量，他们也会有本地链接符号，拥有唯一的名字。  &lt;/p&gt;
+
+    &lt;p&gt;解析全局符号。的那个编译器遇到一个不是在当前模块中定义的符号时，会假设该符号在其他某个模块中定义的，生成一个连接器符号表表木并把它交给链接器处理。如果链接器在它的任何输入模块都找不到这个被引用的符号，就输出一条错误信息并终止。相同符号会被多个目标文件定义，这种情况，链接器要么标志一个错误，要么以某种方法选出一个定义并抛弃其他定义。&lt;br /&gt;
+ &amp;gt; 如何解析多处定义的全局符号：函数和已初始化的全局变量是强符号，未初始化的全局变量是若符号。处理多处定义的规则：&lt;br /&gt;
+  &amp;gt;1. 不允许有多个强符号； &lt;br /&gt;
+  &amp;gt;2. 如果一个强符号和多个若符号，则选择强符号； &lt;br /&gt;
+  &amp;gt;3. 如果有多个若符号，则从若符号中任意选择一个。&lt;br /&gt;
+ &lt;strong&gt;&lt;em&gt;规则2和规则3引起注意：不同的程序模块中定义相同符号时，一强一弱的情况下，链接器会静默选择强符号，尤其在重复的符号定义为不同类型时，会引起不易察觉的严重错误。例如一个double型符号会可能会覆盖两个int型符号。&lt;/em&gt;&lt;/strong&gt;&lt;br /&gt;
+ &lt;strong&gt;&lt;em&gt;另一个经验是，注意查看warning&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;重定位：编译器和汇编器生成从地址零开始的代码和数据节。连接器通过把每个符号定义与一个存储器位置联系起来，然后修改所有对这些符号的引用，使得它们指向这个存储器位置，而重定位这些节。  &lt;br /&gt;
+&amp;gt; &lt;strong&gt;与静态库链接&lt;/strong&gt;   静态库：将所有目标模块打包成一个单独的文件，可以作为链接器的输入。当连接器构造一个输出的可执行文件时，只拷贝静态库里被应用程序引用的目标模块。    &lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;7.3 目标文件    &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;可重定位目标文件：包含二进制代码和数据，可以在编译时与其他可重定位目标文件合并起来，创建一个可执行目标文件。  &lt;/li&gt;
+  &lt;li&gt;可执行目标文件：包含二进制代码和数据，其形式可以被直接拷贝到存储器并执行。  &lt;/li&gt;
+  &lt;li&gt;共享目标文件：特殊类型的可重定位目标文件，在加载或运行时被动态加载到存储器并链接。    &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;7.9 加载可执行目标文件 &lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;内存位置&lt;/td&gt;
+      &lt;td&gt;备注&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;:———-&lt;/td&gt;
+      &lt;td&gt;:————&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;内核虚拟存储器&lt;/td&gt;
+      &lt;td&gt;用户代码不可见&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;用户栈&lt;/td&gt;
+      &lt;td&gt;运行时创建&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;共享库的存储器映射区域&lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;运行时堆&lt;/td&gt;
+      &lt;td&gt;由malloc创建&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;读写段（.data, .bss）&lt;/td&gt;
+      &lt;td&gt;从可执行文件中加载&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;只读段（.init, .text, .rodata）&lt;/td&gt;
+      &lt;td&gt;从可执行文件中加载&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;未使用&lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;7.10 动态链接共享库  &lt;/p&gt;
+
+&lt;p&gt;共享库：在运行时，可以加载到任意存储器地址，并在存储器中和一个程序链接起来。即为由动态链接器程序执行的动态链接。  &lt;/p&gt;
+
+&lt;h1 id=&quot;ch8-&quot;&gt;CH8 异常控制流&lt;/h1&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;8.1 异常&lt;/h3&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;类别&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;原因&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;异步/同步&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;返回行为&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;中断&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;来自I/O设备的信号&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;异步&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;总是返回到下一条指令&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;陷阱&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;有意的异常&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;同步&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;总是返回到下一条指令&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;故障&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;潜在可恢复的错误&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;同步&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;可能返回到下一条指令&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;终止&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;不可恢复的错误&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;同步&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;不会返回&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;8.4 进程控制&lt;/h3&gt;
+
+&lt;p&gt;父进程调用fork函数创建一个新的运行子进程。  &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;fork函数一次调用，两次返回。一次返回到父进程，一次返回到新建的子进程。&lt;/li&gt;
+  &lt;li&gt;父子进程并发执行，独立运行。内核以任意方式交替执行。  &lt;/li&gt;
+  &lt;li&gt;父子进程具有相同但独立的地址空间。相同的用户栈、本地变量值、堆、全局变量值，以及相同的代码，但都有独自的私有地址空间，任何对变量的修改都是独立的，不会反映在另一个进程的存储器中。  &lt;/li&gt;
+  &lt;li&gt;父子进程共享文件。子进程继承了父进程所有的文件。   &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;回收子进程&lt;br /&gt;
+当一个进程由于某种原因终止时，进程保持在终止状态，直到被父进程回收。一个终止但未被回收的进程称为僵死进程。  &lt;br /&gt;
+父进程未回收子进程就终止的情况，由init进程来回收。&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 19 Apr 2015 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2015/04/19/ComputerSystems.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2015/04/19/ComputerSystems.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Linux高性能服务器编程-读书笔记-CH8</title>
+        <description>&lt;h1 id=&quot;linux&quot;&gt;Linux高性能服务器编程&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Elaine @2015.4.18&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;第八章 高性能服务器程序框架&lt;/h3&gt;
+
+&lt;p&gt;服务器程序的三个主要模块    &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;I/O处理单元    &lt;/li&gt;
+  &lt;li&gt;逻辑单元   &lt;/li&gt;
+  &lt;li&gt;存储单元   &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;服务器模型&lt;/strong&gt;    &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;&lt;em&gt;C/S模型&lt;/em&gt;&lt;/strong&gt; &lt;br /&gt;
+  客户端/服务器模型
+  服务器启动后，创建一个或多个监听socket，调用bind函数绑定服务器端口，调用listen函数等待客户连接。服务器稳定运行后，客户端调用connect函数向服务器发起连接。客户端的异步请求需要服务器使用某种I/O模型来监听。&lt;br /&gt;
+  C/S模型适合资源相对集中的场合，实现简单，但访问量过大时，所有客户得到的响应都较慢。  &lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;&lt;em&gt;P2P模型&lt;/em&gt;&lt;/strong&gt;&lt;br /&gt;
+  点对点模型，网络上所有主机地位平等。&lt;br /&gt;
+  云计算机群可看做p2p模型的一个典范。当用户之间传输请求过多时，网络负载将加重。&lt;br /&gt;
+  P2P模型往往有一个专门的发现服务器，能够提供查找服务，使得每个客户都尽快找到自己需要的资源。    &lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;服务器编程框架&lt;/strong&gt;    &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;I/O处理单元：服务器管理客户连接的模块。&lt;br /&gt;
+  主要工作：等待并接受新的客户连接，接收客户数据，将服务器数据返回给客户端（数据收发也可能在逻辑单元执行）。服务器机群的I/O处理单元一般都实现了负载均衡。  &lt;/li&gt;
+  &lt;li&gt;逻辑单元：一个进程或线程。&lt;br /&gt;
+  主要工作：分析并处理客户数据，然后将结果传递给I/O处理单元，或直接发送给客户端。服务器机群中一个逻辑单元本身就是一台逻辑服务器。    &lt;/li&gt;
+  &lt;li&gt;网络存储单元：数据库、缓存和文件，甚至是独立服务器，但不是必须的。   &lt;/li&gt;
+  &lt;li&gt;请求队列：各个单元之间的通信方式的抽象。服务器机群的请求队列是各台服务器之间预先建立的、静态的、永久的TCP连接。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;I/O模型&lt;/strong&gt;&lt;br /&gt;
+阻塞I/O、I/O复用和信号驱动I/O都是同步I/O模型。I/O的读写操作都是在I/O事件发生之后，由应用程序完成的。对异步I/O而言，用户可以直接对I/O执行读写操作，这些操作告诉内核用户读写缓冲区的位置，以及I/O操作完成后内核通知应用程序的方式。异步I/O的读写操作总是立即返回，不论是否阻塞，真正的读写由内核接管。  &lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;两种高效的事件处理模式&lt;/strong&gt;  &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Reactor  同步I/O &lt;br /&gt;
+  主线程只监听是否有事件发生，有则通知工作线程，读写数据、接受新连接、处理请求均在工作线程完成。&lt;br /&gt;
+    &lt;ol&gt;
+      &lt;li&gt;主线程在epoll内核事件表注册socket上的读就绪事件。  &lt;/li&gt;
+      &lt;li&gt;主线程调用epoll_wait等待socket上的数据可读。  &lt;/li&gt;
+      &lt;li&gt;当socket上有数据可读时，epoll_wait通知主线程。主线程将socket可读事件放入请求队列。  &lt;/li&gt;
+      &lt;li&gt;睡眠在请求队列的某个工作线程被唤醒，它从socket读取数据，处理客户请求，然后往epoll内核注册该socket上的写就绪事件。  &lt;/li&gt;
+      &lt;li&gt;主线程调用epoll_wait等待socket可写。  &lt;/li&gt;
+      &lt;li&gt;socket可写时，epoll_wait通知主线程。主线程将socket可写事件放入请求队列。  &lt;/li&gt;
+      &lt;li&gt;睡眠在请求队列上的某个工作线程被唤醒，往socket上写入服务器处理客户请求的结果。  &lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Proactor 异步I/O  &lt;br /&gt;
+  将所有I/O操作都交给主线程和内核来处理，工作线程仅负责业务逻辑。&lt;br /&gt;
+    &lt;ol&gt;
+      &lt;li&gt;主线程调用aio_read向内核注册socket上的读完成时间，并告诉内核用户缓冲区的位置，以及读操作完成时如何通知该应用程序。  &lt;/li&gt;
+      &lt;li&gt;主线程继续处理其他逻辑。  &lt;/li&gt;
+      &lt;li&gt;当socket上的数据被读入用户缓冲区后，内核向应用程序发送一个信号，以通知应用程序数据已经可用。  &lt;/li&gt;
+      &lt;li&gt;应用程序预先定义好的信号处理函数选择一个工作线程来处理客户请求，工作线程处理完客户请求之后，调用aio_write函数向内核注册socket上的写完成事件，并告诉内核用户写缓冲区的位置，以及写操作完成时如何通知应用程序。  &lt;/li&gt;
+      &lt;li&gt;主线程继续处理其他逻辑。  &lt;/li&gt;
+      &lt;li&gt;当用户缓冲区的数据被写入socket后，内核向应用程序发送一个信号，通知应用程序数据已经发送完毕。&lt;/li&gt;
+      &lt;li&gt;应用程序预先定义好的信号处理函数选择一个工作线程来做善后处理，比如决定是否关闭socket。  &lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;高效并发模式&lt;/strong&gt;   &lt;/p&gt;
+
+&lt;p&gt;计算密集型程序不适合并发，任务切换导致效率更低。    &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;半同步/半异步模式&lt;br /&gt;
+  这里的“同步”：完全按照程序代码顺序执行；“异步”：程序执行需要系统事件驱动。&lt;br /&gt;
+  同步线程用于处理客户逻辑，异步线程用于处理I/O事件。    &lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;领导者/追随者模式&lt;br /&gt;
+  多个工作线程轮流获得事件源集合，轮流监听、分发处理事件的一种模式。任意时间点只有一个领导者线程，负责监听I/O事件，其他线程都是追随者。   &lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+        <pubDate>Sat, 18 Apr 2015 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2015/04/18/LearnLinux07.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2015/04/18/LearnLinux07.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>一个人的朝圣</title>
+        <description>&lt;h1 id=&quot;section&quot;&gt;一个人的朝圣&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Elaine @2015.2.6&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;人生中，总有一些路，只能一个人走。 &lt;br /&gt;
+面朝阳光，把黑暗甩在身后。 &lt;br /&gt;
+也许孤单极了，也许无奈极了，也许绝望极了。&lt;br /&gt;
+这些都不重要，重要的是，你一直在向前走，不曾放弃。  &lt;/p&gt;
+
+&lt;p&gt;哈罗德为了让一个二十年未见的朋友战胜癌症，而徒步六百多英里，从自己的住处，那个曾经幸福而今压抑的地方，走到了朋友临终的居所。这一路无数次想要放弃，却总会碰上不同的人，他们讲着不同的故事，感染着他，鼓励着他。他也曾为温柔的晨光或是壮阔的晚霞而惊叹，却也会遇上那些不相信他会用徒步去救一个癌症病人的悲观者。他一个人走这一路，从一个衣冠楚楚的绅士，变成了一个浑身污垢却毫不在乎的糟老头，他想起了这二十年自己与妻子的生活是如何从幸福甜蜜变成形同陌路——他们那么爱着对方，却狠心的伤害对方。他想起了他的儿子，他不知该如何面对的儿子，却在故事的结尾，才说起了那个他一直觉得愧疚的儿子已经自杀了二十年。二十年前，正是儿子的自杀，他沉浸在自责中无法自拔，妻子也怪他没尽到父亲的责任而与他分居。他开始酗酒，他去工作场所闹事，却有个朋友替他顶下了荒唐的罪，而那个朋友，二十年后躺在修道院，饱受癌症折磨。   &lt;/p&gt;
+
+&lt;p&gt;他以为他是去救那个朋友的，为了还二十年前欠下的人情，而一路的旅途结束后，事实却是他被救赎。他想通了这些年自己的日子是如何急转直下的，他的妻子因为他的离开而开始审视他们之间的生活，是怎样变成了那样的别扭和压抑。&lt;/p&gt;
+
+&lt;p&gt;故事的结局，靠信念徒步六百多英里的朝圣者哈罗德，感动了不列颠，却没能留下朋友，还好朋友走的很安详。而哈罗德和他的妻子，又找回了当年他们初见的感觉。原来这二十年，爱，从未离开。  &lt;/p&gt;
+
+&lt;p&gt;看书的过程就像哈罗德的旅程，无数次想要放弃，因为看着哈罗德在路上一天天遇到的形形色色却大同小异生活平淡的人们，讲着琐碎的生活，实在乏味。他们中有积极的乐天派，也有悲观的负能量传播者，平凡的就像是生活在我们身边的人们。我甚至也怀疑过，哈罗德是否能走到终点，毕竟是一个六十多岁的老头子，身体又不好，谁知道会是个什么结果。但庆幸我还是坚持看完了，因为看到结局的时候，自己心里的震撼，就像是和哈罗德一起走过了六百多英里，原来故事是这样的。  &lt;/p&gt;
+
+&lt;p&gt;原来人生就是这样的。总有些时候孤单、痛苦，都注定只能一肩承担，但千万别放弃，因为当这一切结束的时候，连自己都会佩服自己。最后一刻，哈罗德走过了万水千山，终于知道自己想要的是什么了，却不得不再次放弃一些什么，这样的痛，同样也是成长，因为他已经知道，什么才是最重要的。也许一辈子的时间太短，所以我们都在赶时间赶路，却把生活搞得一团糟，别急别担心，是时候放慢脚步，我们需要静下来想想，就像一个人孤零零的走在天地间，只有这时候，才能真的抛弃一切，看到自己最想要的。  &lt;/p&gt;
+
+&lt;p&gt;我庆幸自己在24岁的最后一天看完了这个故事，看似平淡却波澜壮阔。愿在今后的每一天，我都有那炽烈而生生不息的信念，陪伴着我，走的更远。&lt;/p&gt;
+</description>
+        <pubDate>Fri, 06 Feb 2015 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2015/02/06/singleway.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2015/02/06/singleway.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Hello, 2015</title>
+        <description>&lt;h1 id=&quot;hello-2015&quot;&gt;Hello, 2015&lt;/h1&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Edit by Elaine @2014-12-31 &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;此时此刻，突然很想听《秒速五厘米》片尾的那首《one more time, one more chance》。这部新海诚的经典之作，每次这首歌响起的时候，眼泪都会忍不住在眼眶打转。这些年过去，依然矫情如此。 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/5cm.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;去年今日的此时，我在磨子桥的肯德基。&lt;br /&gt;
+落地窗外的成都，行人来来往往，车灯摇曳。斑马线一头的情侣，女生穿的像个球，把戴着手套的手捂在脸上抵挡寒风，面前的男生瘦瘦高高，轻轻帮她理一理围巾，街灯昏黄，他们的脸被晕上温暖的橘色……红灯变绿了，他们牵起手走了。我不禁笑了，有些幸福是会传染的。&lt;/p&gt;
+
+&lt;p&gt;肯德基里的灯光照亮了每一个角落，温暖而热闹，这样的日子，是该跟重要的人在一起，毕竟是2013-14的跨年，毕竟，是一生一世的纪念。&lt;/p&gt;
+
+&lt;p&gt;那一天的很多细节我都记不清楚了，只记得零点的时候，远方的天空绽开了绚烂的烟花，我抬头怔怔的看着，一个声音似有似无，新年快乐。&lt;/p&gt;
+
+&lt;p&gt;我只记得宿舍楼下的腊梅花香让人心醉，操场的灯灭了，像是电影开场前的黑暗。然后，我该是等了很久，却也没等来片中主角的出现，可能是只播完了片名，然后就草草放起了片尾曲，我甚至不知道主演是谁，如今，连片名也想不起了。&lt;/p&gt;
+
+&lt;p&gt;纪念即便再隆重，也只是对自己灵魂的抚慰，有些东西，捉不住，却也抹不掉。它不咸不淡的存在着，模糊的任你揉痛了眼睛也看不清，却又清楚的在你的心尖叩击，声音久久回荡在胸腔，闷的你喘不上气。&lt;/p&gt;
+
+&lt;p&gt;我问小黄，如果人的记忆有效期只有一年，每年的1月1日0点自动清除，好还是不好？&lt;/p&gt;
+
+&lt;p&gt;小黄说，那应该会有很多人写很多很多日记吧。就像你。&lt;/p&gt;
+
+&lt;p&gt;我哑然。我有很多本日记，我曾经，在24岁之前，很喜欢写日记。因为我知道，很多东西注定是要失去的，比如时间，比如在流淌的时间上上演的生活。于是我拼了命的想要把它们都记录下来，遇见的人，说过的话，发生的事，他的表情，他的神态，我心里的小变化。纪念即便再隆重，也不如珍惜每一分每一秒来的真诚。  &lt;/p&gt;
+
+&lt;p&gt;所以特别残忍，那些事情不但写在了本子上，也因为被反复回忆了很多遍而刻在心上，而偏偏，我会记录的，都是自己觉得会失去的东西。  &lt;/p&gt;
+
+&lt;p&gt;更妙的是，我每次都料得准，但我没料到我以为不会再弄丢的东西，最终还是丢了。虽然没有写在日记里了，但是我比任何时候都认真，所以也没什么好遗憾的。  &lt;/p&gt;
+
+&lt;p&gt;2014是很特别的一年。这一年经历了很多，愈发觉得自己很多时候天真的像个孩子，成长的空间还很大。 &lt;/p&gt;
+
+&lt;p&gt;2014年，在选择的揪扯中挣扎。在人与人之间，在城市与城市之间，在公司与公司之间。 &lt;/p&gt;
+
+&lt;p&gt;2014年，给自己了一个郑重的承诺，准备给自己打开一个全新的未来，不再依赖，不再等待。&lt;/p&gt;
+
+&lt;p&gt;2014年，活在梦与现实的边缘。&lt;/p&gt;
+
+&lt;p&gt;如果我说2014别走，时间就能停下，那我也许愿意尝试恳求。但回头闭上眼，又多么想这一页快点翻篇。  &lt;/p&gt;
+
+&lt;p&gt;2015年，人生的转折在即。愿我耐得住寂寞，顶得住压力。披荆斩棘，步步为营。&lt;/p&gt;
+
+&lt;p&gt;2015年，全新的自己。坚持一件对的事也许需要很多个理由，如果说服了自己，就坚持下去。放弃一件错的事，却该是挥一挥衣袖，去寻找下一片云彩。&lt;/p&gt;
+
+&lt;p&gt;2015年，全新的生活。不知前路几多荆棘几多欢喜，且都按下性子慢慢享受。&lt;/p&gt;
+
+&lt;p&gt;2015年之后的几年，依然不在父母身边，当初给自己的计划是他们不接受的承诺。父母在不远游，但，游必有方。愿他们幸福安康。&lt;/p&gt;
+
+&lt;p&gt;Hello，2015。全力奔跑，生命中的每一秒，都是不再重来的至宝。&lt;/p&gt;
+</description>
+        <pubDate>Wed, 31 Dec 2014 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/2014/12/31/hello2015.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/2014/12/31/hello2015.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Linux高性能服务器编程-读书笔记-CH7</title>
@@ -339,494 +1035,6 @@
         <pubDate>Fri, 12 Dec 2014 00:00:00 +0800</pubDate>
         <link>http://yourdomain.com/2014/12/12/hacker.html</link>
         <guid isPermaLink="true">http://yourdomain.com/2014/12/12/hacker.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Socket API 编程实践（1）</title>
-        <description>&lt;h1 id=&quot;socket-api-1&quot;&gt;Socket API 编程实践（1）&lt;/h1&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;这集副标题是 &lt;em&gt;菜鸟的丢人史&lt;/em&gt;&lt;/h2&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;Edit by Elaine @ 2014-12-9   &lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;这几天看论文看的有些头痛，想着还是写写代码轻松一下，没想到还是遇到了各种问题。作为一个初学Linux网络编程的菜鸟，表示有些东西，理论背的再熟练，都不及动手写一个代码长记性。   &lt;/p&gt;
-
-&lt;p&gt;这段时间，《Linux高性能服务器编程》看到了第五章，深感唯有动手编码才能领会各种协议和Socket的精髓。抄了书上几个例子，竟然有因为抄错代码运行不出正确结果而纠结了一天的荒唐事发生，真是无颜号称自己是计算机专业的学生。究其原因，无非是自己只是把书上的理论看过了，却没能实际理解，抄了书上的代码，却没有逐句去琢磨每行代码的作用。   &lt;/p&gt;
-
-&lt;p&gt;今晚，想着从书上给的TCP的发送/接收数据的例子稍微扩展一下，写个UDP的玩玩，本想着完全没有难度，因为Socket API几乎已经完成了绝绝大多数工作，只需要把逻辑理清楚就行了。结果……啊唏……  &lt;/p&gt;
-
-&lt;p&gt;先说我理解的&lt;strong&gt;TCP发送和接收数据&lt;/strong&gt;的过程：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;发送端：  &lt;/p&gt;
-
-    &lt;p&gt;1.读取服务器（目的主机）IP，Port，转换为&lt;code&gt;sockaddr_in&lt;/code&gt;。这里注意三个字段：&lt;code&gt;sin_family&lt;/code&gt;, &lt;code&gt;sin_addr&lt;/code&gt;, &lt;code&gt;sin_port&lt;/code&gt;: TCP/IP协议族的&lt;code&gt;sin_family&lt;/code&gt;指定为&lt;code&gt;AF_INET&lt;/code&gt;； &lt;code&gt;sin_addr&lt;/code&gt;才是真正存放转换后的IP地址的字段； &lt;code&gt;sin_port&lt;/code&gt;存放转换后的端口号。（&lt;strong&gt;转换指转为网络字节序&lt;/strong&gt;） &lt;br /&gt;
-  2.建立Socket。&lt;code&gt;socket&lt;/code&gt;系统调用，第二个参数指定为&lt;code&gt;SOCK_STREAM&lt;/code&gt;时为TCP协议，数据流。 返回值非负时成功建立socket。&lt;br /&gt;
-  3.请求连接。&lt;code&gt;connect&lt;/code&gt;系统调用，返回值小于0时，连接失败。否则即可发送数据，&lt;strong&gt;此时三次握手已经完成&lt;/strong&gt;。&lt;br /&gt;
-  4.发送数据。&lt;code&gt;send&lt;/code&gt;系统调用，可发送&lt;code&gt;normal_data&lt;/code&gt;（正常数据）和&lt;code&gt;oob_data&lt;/code&gt;（TCP带外数据，紧急数据）。
-  5.数据发完，关闭连接。  &lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;接收端：&lt;br /&gt;
-  1.读取服务器程序IP，Port，转换为&lt;code&gt;sockadd_in&lt;/code&gt;。注意字段同发送端。&lt;br /&gt;
-  2.建立socket，&lt;code&gt;socket&lt;/code&gt;系统调用。 &lt;br /&gt;
-  3.绑定地址。&lt;code&gt;bind&lt;/code&gt;系统调用，绑定&lt;code&gt;sockfd&lt;/code&gt;与服务器程序地址（&lt;code&gt;sockadd_in&lt;/code&gt;类型的地址）。&lt;br /&gt;
-  4.监听端口。&lt;code&gt;listen&lt;/code&gt;系统调用。监听服务器程序所在端口（根据&lt;code&gt;sockfd&lt;/code&gt;）。
-  5.接受连接。&lt;code&gt;accept&lt;/code&gt;系统调用。&lt;strong&gt;此时三次握手至少已完成前两次握手&lt;/strong&gt;。&lt;br /&gt;
-  6.接受数据。&lt;code&gt;recv&lt;/code&gt;系统调用。第三个参数可选&lt;code&gt;MSG_OOB&lt;/code&gt;表示带外紧急数据，0表示普通数据。 &lt;br /&gt;
-  7.数据传送结束，关闭连接。    &lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;今天写的UDP传送数据的过程与TCP过程有相似之处，但有巨大的差异，建立socket的参数不同，发送接收的系统调用函数不同，不再赘述。&lt;br /&gt;
-两个协议虽然逻辑都不复杂，差异也很明显：&lt;strong&gt;TCP面向连接，数据可靠，基于字节流；而UDP无连接，不可靠，基于数据报&lt;/strong&gt;。但是写起代码来，居然忘了这些，只一味模仿TCP，简直汗颜。直到代码运行后，始终在listen之后提示错误，半天才意识到，UDP是无连接的，不用侦听端口，只需要绑定地址之后就开始传送数据了，自然也不存在接收端的接受连接，和发送端的请求连接。  &lt;/p&gt;
-
-&lt;p&gt;为了提醒自己UDP无连接的特性，还是将代码中错误的部分保留，仅用注释标记：   &lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;	// SEND 
-	#include &amp;lt;sys/types.h&amp;gt;
-	#include &amp;lt;sys/socket.h&amp;gt;
-	#include &amp;lt;libgen.h&amp;gt;
-	#include &amp;lt;assert.h&amp;gt;
-	#include &amp;lt;errno.h&amp;gt;
-	#include &amp;lt;stdlib.h&amp;gt;
-	#include &amp;lt;stdio.h&amp;gt;
-	#include &amp;lt;netinet/in.h&amp;gt;
-	#include &amp;lt;arpa/inet.h&amp;gt;
-	#include &amp;lt;unistd.h&amp;gt;
-	#include &amp;lt;string.h&amp;gt;
-
-	#define BUFFER_SIZE 1024
-
-	int main(int argc, char* argv[]) {
-		if (argc &amp;lt;= 2) {
-			printf (&quot;usage: %s ip_address, port number.\n&quot;, basename(argv[0]));
-			return 1;
-		}
-		
-		int port = atoi(argv[2]);
-		const char* ip = argv[1];
-
-		struct sockaddr_in address;
-		bzero(&amp;amp;address, sizeof(address));
-		address.sin_family = AF_INET;
-		inet_pton(AF_INET, ip, &amp;amp;address.sin_addr);
-		address.sin_port = htons(port);
-
-		int sockfd = socket(PF_INET, SOCK_DGRAM, 0);
-		assert(sockfd &amp;gt;= 0);
-
-		
-		/* if (connect(sockfd, (struct sockaddr*)&amp;amp;address, sizeof(address)) &amp;lt; 0) {
-		 	printf(&quot;connect failed\n&quot;);
-		 	return -1;
-		 } */
-		//else {
-			const char* buffer = &quot;hello Elaine&quot;;
-			sendto(sockfd, buffer, strlen(buffer), 0, (sockaddr*)&amp;amp;address, sizeof(address));
-		//}
-		close(sockfd);
-		return 0;
-
-	}   
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;hr /&gt;
-
-&lt;pre&gt;&lt;code&gt;	// RECV  
-	#include &amp;lt;sys/socket.h&amp;gt;
-	#include &amp;lt;sys/types.h&amp;gt;
-	#include &amp;lt;netinet/in.h&amp;gt;
-	#include &amp;lt;arpa/inet.h&amp;gt;
-	#include &amp;lt;assert.h&amp;gt;
-	#include &amp;lt;stdio.h&amp;gt;
-	#include &amp;lt;unistd.h&amp;gt;
-	#include &amp;lt;stdlib.h&amp;gt;
-	#include &amp;lt;errno.h&amp;gt;
-	#include &amp;lt;string.h&amp;gt;
-	#include &amp;lt;libgen.h&amp;gt;
-	#include &amp;lt;iostream&amp;gt;
-	using namespace std;
-
-	#define BUFFER_SIZE 1024
-
-	int main(int argc, char* argv[]) {
-		if (argc &amp;lt;= 2) {
-			printf(&quot;usage:%s ip_address, port number\n&quot;, basename(argv[0]));
-			return 1;
-		}
-		const char* ip = argv[1];
-		int port = atoi(argv[2]);
-
-		struct sockaddr_in address;
-		bzero(&amp;amp;address, sizeof(address));
-		address.sin_family = AF_INET;
-		inet_pton(AF_INET, ip , &amp;amp;address.sin_addr);
-		address.sin_port = htons(port);			int sock = socket(AF_INET, SOCK_DGRAM, 0);
-		assert(sock &amp;gt;= 0);
-
-		int ret = bind(sock, (struct sockaddr*)&amp;amp;address, sizeof(address));
-		assert(ret != -1);
-
-		//ret = listen(sock, 5);
-
-		struct sockaddr_in client;
-		socklen_t client_addrlength = sizeof(client);
-	
-		/* int connfd = accept(sock, (struct sockaddr*)&amp;amp;client, &amp;amp;client_addrlength);
-		 if (connfd &amp;lt; 0) {
-		 	printf(&quot;errno is %d\n&quot;, errno);
-		 }*/
-		// else {
-			char buffer[BUFFER_SIZE];
-			memset(buffer,&#39;\0&#39;,sizeof(buffer));
-			ret = recvfrom(sock, buffer, BUFFER_SIZE-1, 0, (struct sockaddr*)&amp;amp;client, &amp;amp;client_addrlength);
-			printf(&quot;got %d bytes of udp data &#39;%s&#39; \n&quot;, ret, buffer);
-		//}
-		close(sock);
-		return 0;
-	}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;section-1&quot;&gt;就当我在卖萌吧…&lt;/h2&gt;
-</description>
-        <pubDate>Tue, 09 Dec 2014 00:00:00 +0800</pubDate>
-        <link>http://yourdomain.com/2014/12/09/SocketPractice1.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/2014/12/09/SocketPractice1.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Linux高性能服务器编程-读书笔记-CH5</title>
-        <description>&lt;h1 id=&quot;linux&quot;&gt;Linux高性能服务器编程&lt;/h1&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;Edit by Elaine @2014.12.6&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&quot;linuxapi&quot;&gt;第五章 Linux网络编程基础API&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;socket地址API  &lt;br /&gt;
-  &amp;gt; * &lt;strong&gt;字节序&lt;/strong&gt;：大端：高位存在低地址；小端：低位存在低地址  ；&lt;br /&gt;
-  &amp;gt; * 大多数PC采用小端字节序，因此小端字节序又称为主机字节序； &lt;br /&gt;
-  &amp;gt; * 网络发送端总是把数据转换为大端字节序，接收端机器根据自己的字节序决定是否转换。大端字节序又称为网络字节序。 &lt;br /&gt;
-  &amp;gt; * JAVA虚拟机采用大端字节序。   &lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;创建Socket    &lt;br /&gt;
-  使用Linux系统调用即可，注意参数。    &lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/types.h&amp;gt;      
-  int socket( int domain, int type, int protocol) ;     
-  /* domain: 协议族 ；  
-   * type: 服务类型；  
-   * protocol: 具体的协议;   */
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;命名 Socket  &lt;br /&gt;
-  将一个socket与socket地址绑定称为给socket命名。
-  服务器程序中，只有命名后，客户端才知道如何连接它。  &lt;br /&gt;
-  客户端不需要命名socket而是匿名，操作系统会自动分配socket地址。  &lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/types.h&amp;gt;   
-  #include &amp;lt;sys/socket.h&amp;gt;   
-  int bind( int sockfd, const struct sockaddr* my_addr, socklen_t addrlen );     
-  /* 将my_addr所指的socket地址分配给未命名的sockfd文件描述符，addrlen参数指出该socket地址的长度。     
-  * 失败时返回值：  EACCES: 被绑定的地址是受保护地址，进超级用户能够访问。EADDRINUSE：被绑定的地址正在使用中。*/        
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;监听 Socket &lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/socket.h&amp;gt;  
-  int listen ( int sockfd, int backlog ) ;    
-  /* sockfd: 被监听的socket    
-   * backlog: 提示内核监听队列的最大长度  */     
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;接受连接  &lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  #include  &amp;lt;sys/types.h&amp;gt;   
-  #include &amp;lt;sys/socket.h&amp;gt;   
-  int accept ( int sockfd, struct sockaddr *addr, socklen_t *addrlen)   
-  /* sockfd：执行通过listen系统调用的监听socket;   
-   * addr: 用来获取被接受连接的远端socket地址；   
-   * 成功时返回一个新的连接socket，唯一标识了被接收的这个连接，服务器可通过读写该socket来与被接受连接对应的客户端通信。*/       
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;发起连接  &lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/types.h&amp;gt;  
-  #include &amp;lt;sys/socket.h&amp;gt;    
-  int connect (int sockfd, const struct sockaddr *serv_addr, socklen_t addrlen);    
-  /* sockfd: 由socket系统调用返回一个socket；   
-   * serv_addr:服务器监听的socket地址；   
-   * addrlen: 指定地址的长度；  */
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;关闭连接  &lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;   #include &amp;lt;unistd.h&amp;gt;   
-   int close( int fd);   
-   /* 每次调用，将fd引用次数减一；
-    * 直到为0时，真正关闭连接 */     
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;pre&gt;&lt;code&gt;      #include &amp;lt;sys/socket.h&amp;gt;   
-      int shutdown( int sockfd, int howto );    
-      /* 立即关闭连接。howto决定shutdown行为 */       
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;数据读写 &lt;br /&gt;
-  TCP数据读写   &lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/types.h&amp;gt; 
-  #include &amp;lt;sys/socket.h&amp;gt;  
-  ssize_t recv( int sockfd, void *buf, size_t len, int flags ); 
-  ssize_t send( int sockfd, const void *buf, size_t len, int flag );     
-&lt;/code&gt;&lt;/pre&gt;
-
-    &lt;p&gt;通用数据读写  &lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  #include &amp;lt;sys/socket.h&amp;gt;   
-  ssize_t recvmsg(int sockfd, struct msghdr* msg,  int flags) 
-  ssize_t sendmsg(int sockfd, struct msghdr* msg, int flags)     
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-&lt;p&gt;&lt;strong&gt;Socket API太多了，不再赘述。其中很多参数必须要靠真正的编程实践才能体会其作用，等我的老联想本本的ubuntu装起了，好好写点代码实验下。有种老家伙迎来第二春的快感，毕竟已经废弃它了几个月了。&lt;/strong&gt;&lt;/p&gt;
-</description>
-        <pubDate>Sat, 06 Dec 2014 00:00:00 +0800</pubDate>
-        <link>http://yourdomain.com/2014/12/06/LearnLinux4.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/2014/12/06/LearnLinux4.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Linux高性能服务器编程-读书笔记-CH4</title>
-        <description>&lt;h1 id=&quot;linux&quot;&gt;Linux高性能服务器编程&lt;/h1&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;Edit by Elaine @2014.12.2&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&quot;tcpipinternetweb&quot;&gt;第4章 TCP/IP通信案例：访问Internet上的web服务器&lt;/h3&gt;
-
-&lt;h4 id=&quot;section&quot;&gt;一些概念：&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;正向代理服务器：要求客户端自己设置代理服务器的地址。每次请求都将直接发送到该代理服务器，并由代理服务器来请求目标资源。    &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;反向代理服务器：设置在服务器端，客户端无须进行任何设置。用代理服务器来接收Internet上的连接请求，将请求转发给内部网络上的服务器，并将从内部服务器上得到的结果返回给客户端。   &lt;/p&gt;
-
-    &lt;blockquote&gt;
-      &lt;p&gt;正向代理服务器与客户端在同一个逻辑网络中，反向代理服务器与服务器在同一个逻辑网络中。    &lt;/p&gt;
-    &lt;/blockquote&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;透明代理服务器：只能设置在网关上。可看做正向代理的一种特殊情况。  &lt;/p&gt;
-
-    &lt;blockquote&gt;
-      &lt;p&gt;代理服务器通常还提供缓存目标资源的功能。    &lt;/p&gt;
-    &lt;/blockquote&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;http-&quot;&gt;HTTP服务 通信过程&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;访问DNS服务器     &lt;/li&gt;
-  &lt;li&gt;本地名称查询    &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;HTTP通信    &lt;/p&gt;
-
-    &lt;p&gt;HTTP请求：&lt;br /&gt;
-  1. 短连接：请求处理完后立即关闭连接。同一个客户的多个HTTP请求不能共用一个TCP连接。&lt;br /&gt;
-  2. 长连接：多个请求可以使用同一个TCP连接。极大减少了网络上由于建立TCP连接导致的负荷，减少处理时间。&lt;/p&gt;
-
-    &lt;p&gt;HTTP应答：    &lt;/p&gt;
-
-    &lt;blockquote&gt;
-      &lt;p&gt;100 continue  通知客户端继续发送数据；    &lt;br /&gt;
-200 OK 请求成功； &lt;br /&gt;
-3xx 重定向；&lt;br /&gt;
-4xx 客户端错误； &lt;br /&gt;
-5xx 服务器错误；&lt;/p&gt;
-    &lt;/blockquote&gt;
-
-    &lt;p&gt;Cookie:&lt;br /&gt;
-  HTTP的无状态特性（无上下文），使得交互程序不方便承上启下。cookie是服务器发送给客户端的特殊信息，客户端每次发送给服务器的请求都需要带上这些信息，服务器就可以区分不同客户，基于浏览器的自动登录就是用cookie实现的。   &lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Tue, 02 Dec 2014 00:00:00 +0800</pubDate>
-        <link>http://yourdomain.com/2014/12/02/LearnLinux3.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/2014/12/02/LearnLinux3.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>直面生死</title>
-        <description>&lt;h1 id=&quot;section&quot;&gt;直面生死&lt;/h1&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;Edit by Elaine @2014-12-1   &lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&quot;section-1&quot;&gt;&lt;em&gt;佛说，人生有八苦，生，老，病，死，爱别离，怨长久，求不得，放不下。&lt;/em&gt;&lt;/h3&gt;
-&lt;p&gt;早就听说过这话，也一直记在心里，总在情绪低落的时候，拿出来佯装文艺。我一直觉得这样的智慧实在难得，人生之苦，莫过于此，却鲜有深思。昨天睡前，听了一期柯文哲的演讲&lt;a href=&quot;http://v.youku.com/v_show/id_XNjI5NDAzMzY0.html&quot;&gt;《生与死的智慧》&lt;/a&gt;，将生死讲的透彻，一下子才觉察，人生的所有痛苦，都源于对人生的无能为力，却又无法劝说自己坦然面对。   &lt;/p&gt;
-
-&lt;h3 id=&quot;section-2&quot;&gt;&lt;em&gt;生命花园中的园丁&lt;/em&gt;&lt;/h3&gt;
-&lt;p&gt;柯文哲其人，我不多说，也不论他的政治身份和观点。只说他身为一个外科医生，面对的生死别离，就比我们常人要多得多。 我不敢说医生这个职业该让所有人肃然起敬，至少在我心中，他们是伟大而善良的群体，他们代表着希望。然而，纵然现代医学如何发达，总有解决不了的疑难杂症，总有无能为力的生命逝去。柯文哲说，“医生是生命花园中的园丁”，他们并不能改变生死的结局，而只能尽力，让每个人的活着的时候更加好看，因为人，固有一死。  &lt;/p&gt;
-
-&lt;h3 id=&quot;section-3&quot;&gt;&lt;em&gt;怎样才算活着&lt;/em&gt;&lt;/h3&gt;
-
-&lt;p&gt;生老病死乃人之常情，人总在拼命改造世界，实际能改造的，也只是自己眼中的小世界，是人类自己的生活。人作为与地球上千千万万生命体从生物特征上来说平等的物种，逃不过一个生命体的自然规律。就像《超体》中所说，环境适宜的时候，细胞选择繁殖，而环境恶化的时候，细胞选择永生。佛家说生老病死是八苦之四，不过是因为凡人无法坦然面对这样的轮回，因为即使人心再伟大，每个人最关注的，始终是自己。这其实无论对错，只是人毕竟不是神，那些神祇，不过是人类理想的状态而已。   &lt;/p&gt;
-
-&lt;p&gt;还好，人非草木，更非鸟兽，除了生命，人还有希望，人总是向往着更美好的事物，并且总有人，很可能是绝大多数人，相信着那些美好的事物总会到来。我想，这大概也是推动着人类不断去进步的源动力吧，生生不息的努力，为了在自己永生之后，让后代活的更加舒适，生命如此代代延续，使得人类成为了这地球上亿万年间的赢家，超越了其他仅仅停留在“活着”的层面的动物。    &lt;/p&gt;
-
-&lt;p&gt;柯文哲在演讲中提了一个问题“怎样才算活着”。他说追求这个问题的答案的过程，本身就是这个问题的答案。Can’t agree more. 先哲对这个问题的追寻，使得后代们能够有巨人的肩膀得以立足，吾辈的奋斗和创造，得以使未来人加速前进。这种推动力带来的不是速度上的递增，而是加速度上的递增。正如祖先自拿起第一块石头作为工具使用，就已经开始了人类一发不可收拾的快马加鞭的进化。   &lt;/p&gt;
-
-&lt;h3 id=&quot;an&quot;&gt;&lt;em&gt;A的N次方&lt;/em&gt;&lt;/h3&gt;
-&lt;p&gt;人生再长不过百年，譬如朝露，去日苦多。朝露尚可滋润一方土地，养活几株花草，更何况仁慈的上天已经给了我们更多的时间和足够的机会，去更好的“活着”。愚钝的人，总有许多对生活的抱怨，总是贪心的想要更多，却忘记自己是否应得，平凡之人，在活着的时候立足于脚下之地，保自家安宁，去时也算无所遗憾，难怪一生平淡，好在自给自足也算自在，智者，懂得生死的道理，生之时不辞辛苦，奋斗不息，死之时坦然面对，心中安宁，他的智慧流传在人间，得以永生。   &lt;/p&gt;
-
-&lt;p&gt;柯文哲说，“人生应该像A的N次方”，当你对社会的贡献大于索取，A就是大于1的，此时A的N次方趋向无穷大，社会就会越来越好，反之，A小于1时，A的N次方将会快速趋近于0，社会很快就会崩溃。   &lt;/p&gt;
-
-&lt;p&gt;我不敢说人人都是积极向上的，但人这种生物，在进化的过程中，除了学会了希望，还学会了羞耻心。相信总有绝大多数的人，不会愿意去做那个拖后腿的，这也是人类得以进步的保障。   &lt;/p&gt;
-
-&lt;h3 id=&quot;section-4&quot;&gt;&lt;em&gt;最困难的不是面对各种挫折打击，而是面对各种挫折打击，却不失去对人世的热情&lt;/em&gt;&lt;/h3&gt;
-&lt;p&gt;柯文哲以这句话作为演讲的结束语。  &lt;br /&gt;
-年轻的时候，总探讨这些人生的大哲学是否太过老成？非也，传统观念中年迈之时才来讨论生死，正是因为我们绝大多数都是凡人，那时已有太多的无能为力。&lt;br /&gt;
-所以能在初入社会的时候，就听到前辈这样的道理，并能从中领悟一二，也是一大幸运，不得不感谢这世上总有智者。  &lt;/p&gt;
-
-&lt;hr /&gt;
-&lt;p&gt;人总说“人生苦短”，其实我看来，苦不苦，要看以怎样的心态去面对生，短不短，要看你以怎样的心态面对死。&lt;/p&gt;
-
-</description>
-        <pubDate>Mon, 01 Dec 2014 00:00:00 +0800</pubDate>
-        <link>http://yourdomain.com/2014/12/01/LiveAndDeath.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/2014/12/01/LiveAndDeath.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Linux高性能服务器编程-读书笔记-CH3</title>
-        <description>&lt;h1 id=&quot;linux&quot;&gt;Linux高性能服务器编程&lt;/h1&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;Edit by Elaine @2014.11.30&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&quot;tcp&quot;&gt;第三章 TCP协议详解&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;TCP服务的特点：&lt;br /&gt;
-    &lt;ul&gt;
-      &lt;li&gt;&lt;strong&gt;面向连接&lt;/strong&gt; 双方必须先建立连接，然后开始数据读写。全双工连接，双方数据读写可以通过一个连接进行，完成数据交换后，双方都必须断开连接。 
-  基于广播和多播的应用不能使用TCP，应使用UDP。    &lt;/li&gt;
-      &lt;li&gt;&lt;strong&gt;字节流&lt;/strong&gt; 发送端执行的写操作的次数和接收端执行的读操作次数之间没有固定的数量关系。&lt;strong&gt;应用程序对数据的发送何接收没有边界限制。&lt;/strong&gt;接收端应用程序可以一次读出TCP缓冲区的所有数据，也可分多次读取，取决于应用程序读缓冲区的大小。    &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;strong&gt;可靠的&lt;/strong&gt; 1.采用发送应答机制；2.超时重传机制；3.最终以IP数据报发送，TCP协议还会对报文段进行重排整理。  &lt;/p&gt;
-
-        &lt;p&gt;&lt;em&gt;序号 ISN+首字偏移；&lt;/em&gt; &lt;br /&gt;
-  &lt;em&gt;确认号 ACK=对方序号+1；用于对对方的响应确认。&lt;/em&gt; &lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;TCP连接的建立和关闭         &lt;br /&gt;
-   连接建立：3次握手 &lt;br /&gt;
-    &lt;ol&gt;
-      &lt;li&gt;主机1发送带有SYN标志的同步报文段，向主机2发起连接请求，该报文段包含一个序号；   &lt;/li&gt;
-      &lt;li&gt;主机2发送自己的序号，并对主机1的报文段确认，确认值（ACK）为主机1的序号+1；   &lt;/li&gt;
-      &lt;li&gt;主机1对主机2的报文段确认，TCP连接建立完成。      &lt;/li&gt;
-    &lt;/ol&gt;
-
-    &lt;p&gt;连接关闭：4次挥手    &lt;br /&gt;
-  1. 主机1发送FIN给主机2，请求关闭连接； &lt;br /&gt;
-  2. 主机2确认该报文段；
-  3. 主机2发送自己的结束报文段； &lt;br /&gt;
-  4. 主机1确认主机2的报文段。 &lt;br /&gt;
-  &lt;strong&gt;连接关闭过程可能是客户端主动关闭，也可能是服务器执行主动关闭，也可能是同时关闭&lt;/strong&gt;    &lt;/p&gt;
-
-    &lt;p&gt;半关闭状态
-  TCP连接是全双工的，允许两个方向的数据传输被独立关闭。 &lt;br /&gt;
-  服务器和客户端应用程序判断对方是否已经关闭连接的方法是： read系统调用返回0（收到结束报文段）。由于半关闭状态的存在，TCP连接断开需要4次挥手，双方都要确认对方已经关闭连接。        &lt;/p&gt;
-
-    &lt;p&gt;连接超时 &lt;br /&gt;
-  对于失败的连接，TCP会尝试重连，每次重连的超时时间增加1倍，多次重连失败后，放弃连接并通知应用程序。   &lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;TCP状态转移 &lt;br /&gt;
-  TIME_WAIT状态 &lt;br /&gt;
-    &lt;ol&gt;
-      &lt;li&gt;可靠的终止TCP连接；  &lt;/li&gt;
-      &lt;li&gt;保证让迟来的TCP报文段有足够的时间被识别并丢弃。&lt;br /&gt;
-  Linux系统中，一个TCP端口不能被同时打开多次。只有当前连接不在TIME_WAIT状态，即其连接的报文段已全部处理完毕，才能开启下一次连接。   &lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;复位报文段     &lt;br /&gt;
-  在某些情况下，TCP连接的一端会向另一端发送复位报文段，以通知对方关闭连接或重连。
-    &lt;ol&gt;
-      &lt;li&gt;访问端口不存在，或该端口处于TIME_WAIT状态 ；  &lt;/li&gt;
-      &lt;li&gt;异常终止连接，一旦发送复位报文段，发送端所有排队的数据全丢弃；   &lt;/li&gt;
-      &lt;li&gt;处理半打开连接，一方已关闭连接，另一方没有接到结束报文段而保持连接，此时保持连接的一方发送报文后，将收到复位报文段。   &lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;TCP交互数据流 &lt;br /&gt;
- 适用于实时性要求高的应用程序或协议。
-   Nagle算法： 要求TCP连接双方任意时刻最多只能发送一个未被确认的TCP报文段，在该报文段确认到达之前不能发送其他TCP报文段，在等待确认的同时，手机本端需要发送的微量数据，并在确认到来时，以一个TCP报文段全部发出，减少了网络上微小的TCP报文段数量。&lt;strong&gt;算法优点：确认到达的越快，数据也发送的越快。&lt;/strong&gt;      &lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;TCP成块数据流   &lt;br /&gt;
-  适用于数据量大的应用程序或协议。&lt;br /&gt;
-  发送端可以一次发送多个报文段，接收端可以一次确认多个报文段。能够发送多少与设置的通告窗口大小有关。  &lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;带外数据   &lt;br /&gt;
-  有些传输层协议有带外数据概念。用于迅速通告对方本方发生的重要事件。带外数据比普通数据有更高的优先级，总是立即被发送而不论缓冲区中是否有排队等待发送的普通数据。TCP有紧急指针标志和紧急指针两个字段，相当于带外数据。   &lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;TCP超时重传   &lt;br /&gt;
-  超时发生后执行重传，每次超时时间都增加1倍，几次重传均失败后，由IP和ARP接管。 内核中有两个参数：1. 由IP接管前TCp最少执行的重传次数，默认3；2. 连接放弃前，TCP最多执行的重传次数，默认15。   &lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;拥塞控制  &lt;br /&gt;
-  拥塞控制最终控制的变量是发送端一次性向网络写入的数据量，即SWND发送窗口。SWND限定了发送端能连续发送的TCP报文段数量。    &lt;br /&gt;
-  SWND太小，引起明显的网络延迟，反之则易导致网络拥塞。实际SWND值是RWND（接收方的接收通告窗口）和CWND（发送端拥塞窗口）中的较小者。 &lt;br /&gt;
-    &lt;ol&gt;
-      &lt;li&gt;慢启动、拥塞避免；
-  慢启动的TCP的拥塞窗口一开始是探测性增长的，慢启动会导致拥塞窗口快速膨胀，导致网络拥塞，因此设定慢启动门限值，CWND超过该值时，TCP拥塞控制进入拥塞避免阶段。&lt;br /&gt;
-  &amp;gt;判断拥塞发生的依据：1.传输超时，或者TCP重传定时器溢出。 2.接收到重复的确认报文段。   &lt;br /&gt;
-  &amp;gt;情况1采用慢启动和拥塞避免来处理；情况2使用快速重传和快速恢复来处理。若情况2发生在重传定时器溢出之后，则按照情况1处理。         &lt;/li&gt;
-      &lt;li&gt;快速重传和快速恢复  &lt;br /&gt;
-  判断是否真正发生拥塞：若发送端连续收到3个重复的确认报文段，则认为是拥塞。  &lt;br /&gt;
-  处理方法：&lt;br /&gt;
-  1）当收到3个重复的确认报文段，重新计算慢启动门限，然后立即重传丢失的报文段，并重新设置CWND。&lt;br /&gt;
-  2）每次收到1个重复的确认，设置CWND=CWND+SMSS。此时发送端可以发送新的TCP报文段。&lt;br /&gt;
-  3）当收到新数据的确认时，设置CWND为新的慢启动门限。   &lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Sun, 30 Nov 2014 00:00:00 +0800</pubDate>
-        <link>http://yourdomain.com/2014/11/30/LearnLinux2.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/2014/11/30/LearnLinux2.html</guid>
         
         
       </item>
